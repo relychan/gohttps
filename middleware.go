@@ -32,6 +32,12 @@ func MaxBodySizeMiddleware(maxBodySizeKilobytes int) func(http.Handler) http.Han
 				return
 			}
 
+			// if the content length is unknown, wrap the request body with MaxBytesReader
+			if r.ContentLength <= -1 {
+				body := r.Body
+				r.Body = http.MaxBytesReader(w, body, maxBodySize)
+			}
+
 			next.ServeHTTP(w, r)
 		})
 	}

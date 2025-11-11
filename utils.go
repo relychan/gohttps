@@ -32,7 +32,7 @@ func WriteResponseJSON(w http.ResponseWriter, statusCode int, body any) error {
 	if err != nil {
 		_, wErr := fmt.Fprintf(
 			w,
-			`{"message": "%s"}`,
+			`{"title": "%s"}`,
 			http.StatusText(http.StatusInternalServerError),
 		)
 		if wErr != nil {
@@ -66,15 +66,36 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 	return WriteResponseJSON(w, statusCode, httpError)
 }
 
-// DecodeRequestBody decodes the request body.
+// DecodeRequestBody attempts to decode the HTTP request body into a value of type T.
+//
+// Type Parameters:
+//
+//	T - The type into which the request body should be decoded. Typically a struct matching the expected JSON payload.
+//
+// Parameters:
+//
+//	w    - The http.ResponseWriter used to write error responses if decoding fails.
+//	r    - The *http.Request containing the body to decode.
+//	span - The trace.Span used for recording tracing information and errors.
+//
+// Returns:
+//
+//	*T    - Pointer to the decoded value of type T, or nil if decoding fails.
+//	bool  - True if decoding was successful, false otherwise.
+//
+// Behavior:
+//   - If the request body is missing or cannot be decoded as JSON into type T, the function writes an HTTP error response
+//     (status 422 Unprocessable Entity) to w, sets the span status to error, and returns (nil, false).
+//   - On success, returns a pointer to the decoded value and true.
+//   - The function may write HTTP responses in case of error, but does not write on success.
 func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace.Span) (*T, bool) {
 	if r.Body == nil {
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
 
-		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, map[string]string{
-			"message": message,
-		})
+		respError := NewRFC9457Error(http.StatusUnprocessableEntity, message)
+
+		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
@@ -89,9 +110,9 @@ func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace
 		span.SetStatus(codes.Error, "failed to decode json")
 		span.RecordError(err)
 
-		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, map[string]string{
-			"message": err.Error(),
-		})
+		respError := NewRFC9457Error(http.StatusUnprocessableEntity, err.Error())
+
+		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
