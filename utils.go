@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -88,7 +89,7 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 //     (status 422 Unprocessable Entity) to w, sets the span status to error, and returns (nil, false).
 //   - On success, returns a pointer to the decoded value and true.
 //   - The function may write HTTP responses in case of error, but does not write on success.
-func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace.Span) (*T, bool) {
+func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace.Span, logger *slog.Logger) (*T, bool) {
 	if r.Body == nil {
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
@@ -97,6 +98,7 @@ func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace
 
 		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
+			logger.Error("failed to write response: " + wErr.Error())
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
 
@@ -107,13 +109,15 @@ func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		span.SetStatus(codes.Error, "failed to decode json")
+		span.SetStatus(codes.Error, "Failed to decode JSON")
 		span.RecordError(err)
 
-		respError := NewRFC9457Error(http.StatusUnprocessableEntity, err.Error())
+		logger.Debug("Failed to decode JSON: " + err.Error())
+		respError := NewRFC9457Error(http.StatusUnprocessableEntity, "Invalid request body")
 
 		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
+			logger.Error("failed to write response: " + wErr.Error())
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
 
