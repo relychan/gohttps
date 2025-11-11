@@ -19,23 +19,25 @@ func MaxBodySizeMiddleware(maxBodySizeKilobytes int) func(http.Handler) http.Han
 		errorMessage := fmt.Sprintf("Request body size exceeded %d KB(s)", maxBodySizeKilobytes)
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.ContentLength >= maxBodySize {
-				err := NewRFC9457Error(http.StatusRequestEntityTooLarge, errorMessage)
-				err.Instance = r.URL.Path
+			if r.Body != nil {
+				if r.ContentLength >= maxBodySize {
+					err := NewRFC9457Error(http.StatusRequestEntityTooLarge, errorMessage)
+					err.Instance = r.URL.Path
 
-				wErr := WriteResponseJSON(w, http.StatusRequestEntityTooLarge, err)
-				if wErr != nil {
-					span := trace.SpanFromContext(r.Context())
-					SetWriteResponseErrorAttribute(span, wErr)
+					wErr := WriteResponseJSON(w, http.StatusRequestEntityTooLarge, err)
+					if wErr != nil {
+						span := trace.SpanFromContext(r.Context())
+						SetWriteResponseErrorAttribute(span, wErr)
+					}
+
+					return
 				}
 
-				return
-			}
-
-			// if the content length is unknown, wrap the request body with MaxBytesReader
-			if r.ContentLength <= -1 {
-				body := r.Body
-				r.Body = http.MaxBytesReader(w, body, maxBodySize)
+				// if the content length is unknown, wrap the request body with MaxBytesReader
+				if r.ContentLength <= -1 {
+					body := r.Body
+					r.Body = http.MaxBytesReader(w, body, maxBodySize)
+				}
 			}
 
 			next.ServeHTTP(w, r)
