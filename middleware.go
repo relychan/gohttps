@@ -33,7 +33,7 @@ func MaxBodySizeMiddleware(maxBodySizeKilobytes int) func(http.Handler) http.Han
 					return
 				}
 
-				/// Always wrap the request body with MaxBytesReader to enforce the limit
+				// Always wrap the request body with MaxBytesReader to enforce the limit
 				body := r.Body
 				r.Body = http.MaxBytesReader(w, body, maxBodySize)
 			}
