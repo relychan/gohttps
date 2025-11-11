@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -63,6 +64,42 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 	httpError.Detail = err.Error()
 
 	return WriteResponseJSON(w, statusCode, httpError)
+}
+
+// DecodeRequestBody decodes the request body.
+func DecodeRequestBody[T any](w http.ResponseWriter, r *http.Request, span trace.Span) (*T, bool) {
+	if r.Body == nil {
+		message := "request body is required"
+		span.SetStatus(codes.Error, message)
+
+		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, map[string]string{
+			"message": message,
+		})
+		if wErr != nil {
+			SetWriteResponseErrorAttribute(span, wErr)
+		}
+
+		return nil, false
+	}
+
+	var input T
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		span.SetStatus(codes.Error, "failed to decode json")
+		span.RecordError(err)
+
+		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, map[string]string{
+			"message": err.Error(),
+		})
+		if wErr != nil {
+			SetWriteResponseErrorAttribute(span, wErr)
+		}
+
+		return nil, false
+	}
+
+	return &input, true
 }
 
 // SetWriteResponseErrorAttribute sets the error that happens when writing the HTTP response.
