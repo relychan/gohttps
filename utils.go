@@ -93,7 +93,6 @@ func DecodeRequestBody[T any](
 	w http.ResponseWriter,
 	r *http.Request,
 	span trace.Span,
-	logger *slog.Logger,
 ) (*T, bool) {
 	if r.Body == nil {
 		message := "request body is required"
@@ -103,7 +102,7 @@ func DecodeRequestBody[T any](
 
 		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
-			logger.Error("failed to write response: " + wErr.Error())
+			getRequestLogger(r).Error("failed to write response: " + wErr.Error())
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
 
@@ -117,6 +116,7 @@ func DecodeRequestBody[T any](
 		span.SetStatus(codes.Error, "Failed to decode JSON")
 		span.RecordError(err)
 
+		logger := getRequestLogger(r)
 		logger.Debug("Failed to decode JSON: " + err.Error())
 
 		respError := NewRFC9457Error(http.StatusUnprocessableEntity, "Invalid request body")
@@ -182,4 +182,22 @@ func GetURLParamInt64(r *http.Request, param string) (int64, error) {
 	}
 
 	return value, nil
+}
+
+func getRequestLogger(r *http.Request) *slog.Logger {
+	return slog.Default().With(slog.String("request_id", getRequestID(r)))
+}
+
+func getRequestID(r *http.Request) string {
+	requestID := r.Header.Get("x-request-id")
+	if requestID != "" {
+		return requestID
+	}
+
+	spanContext := trace.SpanContextFromContext(r.Context())
+	if spanContext.HasTraceID() {
+		return spanContext.TraceID().String()
+	}
+
+	return uuid.NewString()
 }
