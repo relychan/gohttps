@@ -101,12 +101,9 @@ func DecodeRequestBody[T any](
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
 
-		respError := NewMissingBodyPropertyError(ErrorDetail{
-			Detail:  "Request body is required",
-			Pointer: "#",
-		})
+		respError := ErrBadRequest
 
-		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
+		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
 			logger := getRequestLogger(r)
 			logger.Error("failed to write response", slog.String("error", wErr.Error()))
@@ -128,7 +125,7 @@ func DecodeRequestBody[T any](
 
 		respError := ErrBadRequest
 
-		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
+		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
 			logger.Error("failed to write response", slog.String("error", wErr.Error()))
 			SetWriteResponseErrorAttribute(span, wErr)
@@ -151,7 +148,7 @@ func GetURLParamUUID(r *http.Request, param string) (uuid.UUID, error) {
 
 	value, err := uuid.Parse(rawValue)
 	if err != nil {
-		respError := NewInvalidRequestHeaderFormatError(ErrorDetail{
+		respError := NewInvalidRequestParameterFormatError(ErrorDetail{
 			Detail:    "Invalid UUID format",
 			Parameter: param,
 		})
@@ -169,7 +166,7 @@ func GetURLParamInt64(r *http.Request, param string) (int64, error) {
 
 	value, err := strconv.ParseInt(rawValue, 10, 64)
 	if err != nil {
-		respError := NewInvalidRequestHeaderFormatError(ErrorDetail{
+		respError := NewInvalidRequestParameterFormatError(ErrorDetail{
 			Detail:    "Invalid integer format",
 			Parameter: param,
 		})

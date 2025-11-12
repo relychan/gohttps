@@ -70,7 +70,7 @@ var ErrAlreadyExists = RFC9457Error{
 var ErrLicenseExpired = RFC9457Error{
 	Type:   "https://problems-registry.smartbear.com/license-expired",
 	Title:  "License Expired",
-	Detail: "The service is unavailable as the license associated with your client or organization has expired. Please contact your account manager or representative",
+	Detail: "The service is unavailable as the license associated with your client or organization has expired. Please contact your account manager or representativ.",
 	Status: http.StatusServiceUnavailable,
 }
 
@@ -78,7 +78,7 @@ var ErrLicenseExpired = RFC9457Error{
 var ErrLicenseCancelled = RFC9457Error{
 	Type:   "https://problems-registry.smartbear.com/license-cancelled",
 	Title:  "License Cancelled",
-	Detail: "The service is unavailable as the license associated with your client or organization has been cancelled. Please contact your account manager or representative",
+	Detail: "The service is unavailable as the license associated with your client or organization has been cancelled. Please contact your account manager or representative.",
 	Status: http.StatusServiceUnavailable,
 }
 
@@ -88,18 +88,18 @@ var ErrLicenseCancelled = RFC9457Error{
 var ErrNotFound = RFC9457Error{
 	Type:   "about:blank",
 	Title:  "Not Found",
-	Detail: "The requested resource was not found",
+	Detail: "The requested resource was not found.",
 	Status: http.StatusNotFound,
 	Code:   "404-01",
 }
 
-// ErrUnauthorized occurs when the requested resource could not be found.
-// Your client application tried to access a resource that does not exist (or could not be found).
-// Please review how your users initiated such a request.
+// ErrUnauthorized occurs when the request lacks valid authentication credentials.
+// Your client application tried to access a resource without providing a valid access token or authentication information.
+// Please ensure that your requests include the necessary authentication credentials.
 var ErrUnauthorized = RFC9457Error{
 	Type:   "about:blank",
 	Title:  "Unauthorized",
-	Detail: "Access token not set or invalid, and the requested resource could not be returned",
+	Detail: "Access token not set or invalid, and the requested resource could not be returned.",
 	Status: http.StatusUnauthorized,
 	Code:   "401-01",
 }
@@ -109,7 +109,7 @@ var ErrUnauthorized = RFC9457Error{
 var ErrForbidden = RFC9457Error{
 	Type:   "about:blank",
 	Title:  "Forbidden",
-	Detail: "The resource could not be returned as the requestor is not authorized",
+	Detail: "The resource could not be returned as the requestor is not authorized.",
 	Status: http.StatusForbidden,
 	Code:   "403-01",
 }
@@ -121,7 +121,7 @@ var ErrForbidden = RFC9457Error{
 var ErrBadRequest = RFC9457Error{
 	Type:   "about:blank",
 	Title:  "Bad Request",
-	Detail: "The request is invalid or malformed",
+	Detail: "The request is invalid or malformed.",
 	Status: http.StatusBadRequest,
 	Code:   "400-01",
 }
@@ -131,7 +131,7 @@ var ErrBadRequest = RFC9457Error{
 var ErrServiceUnavailable = RFC9457Error{
 	Type:   "about:blank",
 	Title:  "Service Unavailable",
-	Detail: "The service is currently unavailable",
+	Detail: "The service is currently unavailable.",
 	Status: http.StatusServiceUnavailable,
 	Code:   "503-01",
 }
@@ -141,7 +141,7 @@ var ErrServiceUnavailable = RFC9457Error{
 var ErrServerError = RFC9457Error{
 	Type:   "about:blank",
 	Title:  "Server Error",
-	Detail: "The server encountered an unexpected error",
+	Detail: "The server encountered an unexpected error.",
 	Status: http.StatusInternalServerError,
 	Code:   "500-01",
 }
@@ -151,7 +151,7 @@ func NewMissingRequestHeaderError(errors ...ErrorDetail) RFC9457Error {
 	return RFC9457Error{
 		Type:   "https://problems-registry.smartbear.com/missing-request-header",
 		Title:  "Missing request header",
-		Detail: "The request is missing an expected HTTP request header",
+		Detail: "The request is missing an expected HTTP request header.",
 		Status: http.StatusBadRequest,
 		Code:   "400-02",
 		Errors: errors,
@@ -204,7 +204,7 @@ func NewInvalidRequestParameterFormatError(errors ...ErrorDetail) RFC9457Error {
 func NewInvalidRequestHeaderFormatError(errors ...ErrorDetail) RFC9457Error {
 	return RFC9457Error{
 		Type:   "https://problems-registry.smartbear.com/invalid-request-header-format",
-		Title:  " Request Header Format",
+		Title:  "Invalid Request Header Format",
 		Detail: "The request contains a malformed request header parameter.",
 		Status: http.StatusBadRequest,
 		Code:   "400-06",
@@ -242,7 +242,7 @@ func NewMissingBodyPropertyError(errors ...ErrorDetail) RFC9457Error {
 	return RFC9457Error{
 		Type:   "https://problems-registry.smartbear.com/missing-body-property",
 		Title:  "Missing body property",
-		Detail: "The request is missing an expected body property",
+		Detail: "The request is missing an expected body property.",
 		Status: http.StatusBadRequest,
 		Code:   "400-09",
 		Errors: errors,
