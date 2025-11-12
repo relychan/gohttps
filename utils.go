@@ -101,13 +101,15 @@ func DecodeRequestBody[T any](
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
 
-		respError := NewRFC9457Error(http.StatusUnprocessableEntity, message)
+		respError := NewMissingBodyPropertyError(ErrorDetail{
+			Detail:  "Request body is required",
+			Pointer: "#",
+		})
 
 		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
-			getRequestLogger(
-				r,
-			).Error("failed to write response", slog.String("error", wErr.Error()))
+			logger := getRequestLogger(r)
+			logger.Error("failed to write response", slog.String("error", wErr.Error()))
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
 
@@ -124,7 +126,7 @@ func DecodeRequestBody[T any](
 		logger := getRequestLogger(r)
 		logger.Debug("failed to decode JSON", slog.String("error", err.Error()))
 
-		respError := NewRFC9457Error(http.StatusUnprocessableEntity, "Invalid request body")
+		respError := ErrBadRequest
 
 		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
@@ -149,18 +151,13 @@ func GetURLParamUUID(r *http.Request, param string) (uuid.UUID, error) {
 
 	value, err := uuid.Parse(rawValue)
 	if err != nil {
-		return value, RFC9457Error{
-			Status:   http.StatusUnprocessableEntity,
-			Title:    http.StatusText(http.StatusUnprocessableEntity),
-			Detail:   "Failed to parse URL parameter",
-			Instance: r.URL.Path,
-			Errors: []ErrorDetail{
-				{
-					Detail:    "Invalid UUID format",
-					Parameter: param,
-				},
-			},
-		}
+		respError := NewInvalidRequestHeaderFormatError(ErrorDetail{
+			Detail:    "Invalid UUID format",
+			Parameter: param,
+		})
+		respError.Instance = r.URL.Path
+
+		return value, respError
 	}
 
 	return value, nil
@@ -172,18 +169,13 @@ func GetURLParamInt64(r *http.Request, param string) (int64, error) {
 
 	value, err := strconv.ParseInt(rawValue, 10, 64)
 	if err != nil {
-		return value, RFC9457Error{
-			Status:   http.StatusUnprocessableEntity,
-			Title:    http.StatusText(http.StatusUnprocessableEntity),
-			Detail:   "Failed to parse URL parameter",
-			Instance: r.URL.Path,
-			Errors: []ErrorDetail{
-				{
-					Detail:    "Invalid integer format",
-					Parameter: param,
-				},
-			},
-		}
+		respError := NewInvalidRequestHeaderFormatError(ErrorDetail{
+			Detail:    "Invalid integer format",
+			Parameter: param,
+		})
+		respError.Instance = r.URL.Path
+
+		return value, respError
 	}
 
 	return value, nil
