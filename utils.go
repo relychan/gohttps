@@ -85,8 +85,11 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 //	bool  - True if decoding was successful, false otherwise.
 //
 // Behavior:
-//   - If the request body is missing or cannot be decoded as JSON into type T, the function writes an HTTP error response
-//     (status 422 Unprocessable Entity) to w, sets the span status to error, and returns (nil, false).
+//   - If the request body is missing (nil or http.NoBody), the function writes an HTTP error response 
+//     (status 422 Unprocessable Entity) with message "request body is required".
+//   - If the request body cannot be decoded as JSON into type T, the function writes an HTTP error response
+//     (status 422 Unprocessable Entity) with message "Invalid request body".
+//   - In both error cases, sets the span status to error and returns (nil, false).
 //   - On success, returns a pointer to the decoded value and true.
 //   - The function may write HTTP responses in case of error, but does not write on success.
 func DecodeRequestBody[T any](
