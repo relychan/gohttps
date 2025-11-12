@@ -102,7 +102,9 @@ func DecodeRequestBody[T any](
 
 		wErr := WriteResponseJSON(w, http.StatusUnprocessableEntity, respError)
 		if wErr != nil {
-			getRequestLogger(r).Error("failed to write response", slog.String("error", wErr.Error()))
+			getRequestLogger(
+				r,
+			).Error("failed to write response", slog.String("error", wErr.Error()))
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
 
