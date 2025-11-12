@@ -94,7 +94,7 @@ func DecodeRequestBody[T any](
 	r *http.Request,
 	span trace.Span,
 ) (*T, bool) {
-	if r.Body == nil {
+	if r.Body == nil || r.Body == http.NoBody {
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
 
@@ -113,11 +113,11 @@ func DecodeRequestBody[T any](
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		span.SetStatus(codes.Error, "Failed to decode JSON")
+		span.SetStatus(codes.Error, "failed to decode JSON")
 		span.RecordError(err)
 
 		logger := getRequestLogger(r)
-		logger.Debug("Failed to decode JSON: " + err.Error())
+		logger.Debug("failed to decode JSON: " + err.Error())
 
 		respError := NewRFC9457Error(http.StatusUnprocessableEntity, "Invalid request body")
 
