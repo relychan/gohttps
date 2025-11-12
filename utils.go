@@ -117,7 +117,7 @@ func DecodeRequestBody[T any](
 		span.RecordError(err)
 
 		logger := getRequestLogger(r)
-		logger.Debug("failed to decode JSON: " + err.Error())
+		logger.Debug("failed to decode JSON", slog.String("error", err.Error()))
 
 		respError := NewRFC9457Error(http.StatusUnprocessableEntity, "Invalid request body")
 
