@@ -21,8 +21,14 @@ func MaxBodySizeMiddleware(maxBodySizeKilobytes int) func(http.Handler) http.Han
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Body != nil {
 				if r.ContentLength >= maxBodySize {
-					err := NewRFC9457Error(http.StatusRequestEntityTooLarge, errorMessage)
-					err.Instance = r.URL.Path
+					err := RFC9457Error{
+						Type:     "about:blank",
+						Title:    http.StatusText(http.StatusRequestEntityTooLarge),
+						Detail:   errorMessage,
+						Status:   http.StatusRequestEntityTooLarge,
+						Code:     "413-01",
+						Instance: r.URL.Path,
+					}
 
 					wErr := WriteResponseJSON(w, http.StatusRequestEntityTooLarge, err)
 					if wErr != nil {
