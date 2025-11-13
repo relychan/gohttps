@@ -101,7 +101,7 @@ func DecodeRequestBody[T any](
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
 
-		respError := ErrBadRequest
+		respError := NewBadRequestError()
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
@@ -123,7 +123,7 @@ func DecodeRequestBody[T any](
 		logger := getRequestLogger(r)
 		logger.Debug("failed to decode JSON", slog.String("error", err.Error()))
 
-		respError := ErrBadRequest
+		respError := NewBadRequestError()
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
