@@ -69,7 +69,7 @@ func NewAlreadyExistsError(errors ...ErrorDetail) RFC9457Error {
 	}
 }
 
-// NewServiceUnavailableError creates an error that occurs when the service requested is currently unavailable and the server is not ready to handle the request
+// NewServiceUnavailableError creates an error that occurs when the service requested is currently unavailable and the server is not ready to handle the request.
 // Your client application did everything correct. Unfortunately our API is currently unavailable.
 func NewServiceUnavailableError(errors ...ErrorDetail) RFC9457Error {
 	return RFC9457Error{
@@ -99,7 +99,7 @@ func NewLicenseExpiredError(errors ...ErrorDetail) RFC9457Error {
 	return RFC9457Error{
 		Type:   "https://problems-registry.smartbear.com/license-expired",
 		Title:  "License Expired",
-		Detail: "The service is unavailable as the license associated with your client or organization has expired. Please contact your account manager or representativ.",
+		Detail: "The service is unavailable as the license associated with your client or organization has expired. Please contact your account manager or representative.",
 		Status: http.StatusServiceUnavailable,
 		Code:   "503-03",
 		Errors: errors,
