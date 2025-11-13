@@ -57,93 +57,125 @@ type ErrorDetail struct {
 	Code string `json:"code,omitempty"`
 }
 
-// ErrAlreadyExists problem occurs when the resource being created is found to already exist on the server.
-var ErrAlreadyExists = RFC9457Error{
-	Type:   "https://problems-registry.smartbear.com/already-exists",
-	Title:  "Already exists",
-	Detail: "The resource being created already exists.",
-	Status: http.StatusConflict,
-	Code:   "409-01",
+// NewAlreadyExistsError creates an error that occurs when the resource being created is found to already exist on the server.
+func NewAlreadyExistsError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "https://problems-registry.smartbear.com/already-exists",
+		Title:  "Already exists",
+		Detail: "The resource being created already exists.",
+		Status: http.StatusConflict,
+		Code:   "409-01",
+		Errors: errors,
+	}
 }
 
-// ErrLicenseExpired occurs when the license associated with the client has expired thus rendering the service unavailable.
-var ErrLicenseExpired = RFC9457Error{
-	Type:   "https://problems-registry.smartbear.com/license-expired",
-	Title:  "License Expired",
-	Detail: "The service is unavailable as the license associated with your client or organization has expired. Please contact your account manager or representativ.",
-	Status: http.StatusServiceUnavailable,
+// NewServiceUnavailableError creates an error that occurs when the service requested is currently unavailable and the server is not ready to handle the request
+// Your client application did everything correct. Unfortunately our API is currently unavailable.
+func NewServiceUnavailableError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "about:blank",
+		Title:  "Service Unavailable",
+		Detail: "The service is currently unavailable.",
+		Status: http.StatusServiceUnavailable,
+		Code:   "503-01",
+		Errors: errors,
+	}
 }
 
-// ErrLicenseCancelled occurs when the license associated with the client has been cancelled thus rendering the service unavailable.
-var ErrLicenseCancelled = RFC9457Error{
-	Type:   "https://problems-registry.smartbear.com/license-cancelled",
-	Title:  "License Cancelled",
-	Detail: "The service is unavailable as the license associated with your client or organization has been cancelled. Please contact your account manager or representative.",
-	Status: http.StatusServiceUnavailable,
+// NewLicenseCancelledError creates an error that occurs when the license associated with the client has been cancelled thus rendering the service unavailable.
+func NewLicenseCancelledError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "https://problems-registry.smartbear.com/license-cancelled",
+		Title:  "License Cancelled",
+		Detail: "The service is unavailable as the license associated with your client or organization has been cancelled. Please contact your account manager or representative.",
+		Status: http.StatusServiceUnavailable,
+		Code:   "503-02",
+		Errors: errors,
+	}
 }
 
-// ErrNotFound occurs when the requested resource could not be found.
+// NewLicenseExpiredError creates an error that occurs when the license associated with the client has expired thus rendering the service unavailable.
+func NewLicenseExpiredError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "https://problems-registry.smartbear.com/license-expired",
+		Title:  "License Expired",
+		Detail: "The service is unavailable as the license associated with your client or organization has expired. Please contact your account manager or representativ.",
+		Status: http.StatusServiceUnavailable,
+		Code:   "503-03",
+		Errors: errors,
+	}
+}
+
+// NewNotFoundError creates an error that occurs when the requested resource could not be found.
 // Your client application tried to access a resource that does not exist (or could not be found).
 // Please review how your users initiated such a request.
-var ErrNotFound = RFC9457Error{
-	Type:   "about:blank",
-	Title:  "Not Found",
-	Detail: "The requested resource was not found.",
-	Status: http.StatusNotFound,
-	Code:   "404-01",
+func NewNotFoundError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "about:blank",
+		Title:  "Not Found",
+		Detail: "The requested resource was not found.",
+		Status: http.StatusNotFound,
+		Code:   "404-01",
+		Errors: errors,
+	}
 }
 
-// ErrUnauthorized occurs when the request lacks valid authentication credentials.
+// NewUnauthorizedError creates an error that occurs when the request lacks valid authentication credentials.
 // Your client application tried to access a resource without providing a valid access token or authentication information.
 // Please ensure that your requests include the necessary authentication credentials.
-var ErrUnauthorized = RFC9457Error{
-	Type:   "about:blank",
-	Title:  "Unauthorized",
-	Detail: "Access token not set or invalid, and the requested resource could not be returned.",
-	Status: http.StatusUnauthorized,
-	Code:   "401-01",
+func NewUnauthorizedError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "about:blank",
+		Title:  "Unauthorized",
+		Detail: "Access token not set or invalid, and the requested resource could not be returned.",
+		Status: http.StatusUnauthorized,
+		Code:   "401-01",
+		Errors: errors,
+	}
 }
 
-// ErrForbidden occurs when the requested resource (and/or operation combination) is not authorized for the requesting client (and or authorization context).
-// Your client application tried to perform an operation on a resource that it’s not authorized to perform in the given context.
-var ErrForbidden = RFC9457Error{
-	Type:   "about:blank",
-	Title:  "Forbidden",
-	Detail: "The resource could not be returned as the requestor is not authorized.",
-	Status: http.StatusForbidden,
-	Code:   "403-01",
+// NewForbiddenError creates an error that occurs when the requested resource
+// (and/or operation combination) is not authorized for the requesting client (and or authorization context).
+// Your client application tried to perform an operation on a resource that
+// it’s not authorized to perform in the given context.
+func NewForbiddenError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "about:blank",
+		Title:  "Forbidden",
+		Detail: "The resource could not be returned as the requestor is not authorized.",
+		Status: http.StatusForbidden,
+		Code:   "403-01",
+		Errors: errors,
+	}
 }
 
-// ErrBadRequest occurs when the server cannot or will not process the request due to something that is perceived to be a client error
+// NewBadRequestError creates an error that occurs when the server cannot or will not process the request
+// due to something that is perceived to be a client error
 // (for example, malformed request syntax, invalid request message framing, or deceptive request routing).
 // Your client application initiated a request that is malformed.
 // Please review your client request against the defined semantics for the API.
-var ErrBadRequest = RFC9457Error{
-	Type:   "about:blank",
-	Title:  "Bad Request",
-	Detail: "The request is invalid or malformed.",
-	Status: http.StatusBadRequest,
-	Code:   "400-01",
+func NewBadRequestError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "about:blank",
+		Title:  "Bad Request",
+		Detail: "The request is invalid or malformed.",
+		Status: http.StatusBadRequest,
+		Code:   "400-01",
+		Errors: errors,
+	}
 }
 
-// ErrServiceUnavailable occurs when the service requested is currently unavailable and the server is not ready to handle the request
-// Your client application did everything correct. Unfortunately our API is currently unavailable.
-var ErrServiceUnavailable = RFC9457Error{
-	Type:   "about:blank",
-	Title:  "Service Unavailable",
-	Detail: "The service is currently unavailable.",
-	Status: http.StatusServiceUnavailable,
-	Code:   "503-01",
-}
-
-// ErrServerError occurs when the server encounters an unexpected condition that prevents it from fulfilling the request.
+// NewServerError creates an error that occurs when the server encounters an unexpected condition that prevents it from fulfilling the request.
 // Your client application did everything correct. Unfortunately our API encountered a condition that resulted in this problem.
-var ErrServerError = RFC9457Error{
-	Type:   "about:blank",
-	Title:  "Server Error",
-	Detail: "The server encountered an unexpected error.",
-	Status: http.StatusInternalServerError,
-	Code:   "500-01",
+func NewServerError(errors ...ErrorDetail) RFC9457Error {
+	return RFC9457Error{
+		Type:   "about:blank",
+		Title:  "Server Error",
+		Detail: "The server encountered an unexpected error.",
+		Status: http.StatusInternalServerError,
+		Code:   "500-01",
+		Errors: errors,
+	}
 }
 
 // NewMissingRequestHeaderError problem occurs when the request sent to the API is missing an expected request header.
