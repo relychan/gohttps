@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/hasura/gotel"
+	"github.com/hasura/gotel/otelutils"
 	"github.com/relychan/gohttps"
 )
 
@@ -19,7 +20,7 @@ func main() {
 		Port:     8080,
 	}
 
-	logger, _, err := gotel.NewJSONLogger(serverConfig.LogLevel)
+	logger, _, err := otelutils.NewJSONLogger(serverConfig.LogLevel)
 	if err != nil {
 		log.Fatalf("failed to initialize logger: %s", err)
 	}
