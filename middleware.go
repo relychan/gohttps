@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/relychan/goutils"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -21,7 +22,7 @@ func MaxBodySizeMiddleware(maxBodySizeKilobytes int) func(http.Handler) http.Han
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Body != nil {
 				if r.ContentLength >= maxBodySize {
-					err := RFC9457Error{
+					err := goutils.RFC9457Error{
 						Type:     "about:blank",
 						Title:    http.StatusText(http.StatusRequestEntityTooLarge),
 						Detail:   errorMessage,

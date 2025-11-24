@@ -16,31 +16,6 @@ const (
 
 var errPrometheusInvalidPort = errors.New("invalid prometheus port")
 
-const (
-	// ContentEncodingHeader is the constant for the Content-Encoding header name.
-	ContentEncodingHeader = "Content-Encoding"
-	// ContentTypeHeader is the constant for the Content-Type header name.
-	ContentTypeHeader = "Content-Type"
-	// ContentTypeJSON is the constant for the application/json content type.
-	ContentTypeJSON = "application/json"
-	// ContentTypeNdJSON is the constant for the application/x-ndjson content type.
-	ContentTypeNdJSON = "application/x-ndjson"
-	// ContentTypeXML is the constant for the application/xml content type.
-	ContentTypeXML = "application/xml"
-	// ContentTypeFormURLEncoded is the constant for the application/x-www-form-urlencoded content type.
-	ContentTypeFormURLEncoded = "application/x-www-form-urlencoded"
-	// ContentTypeMultipartFormData is the constant for the multipart/form-data content type.
-	ContentTypeMultipartFormData = "multipart/form-data"
-	// ContentTypeTextPlain is the constant for the text/plain content type.
-	ContentTypeTextPlain = "text/plain"
-	// ContentTypeTextHTML is the constant for the text/html content type.
-	ContentTypeTextHTML = "text/html"
-	// ContentTypeTextXML is the constant for the text/xml content type.
-	ContentTypeTextXML = "text/xml"
-	// ContentTypeOctetStream is the constant for the application/octet-stream content type.
-	ContentTypeOctetStream = "application/octet-stream"
-)
-
 // ServerConfig holds information of required environment variables.
 type ServerConfig struct {
 	Port               int           `env:"PORT"                        envDefault:"8080"`
@@ -80,20 +55,4 @@ type ServerConfig struct {
 	// CorsOptionsPassthrough instructs preflight to let other potential next handlers to process the OPTIONS method.
 	// Turn this on if your application handles OPTIONS.
 	CorsOptionsPassthrough bool `env:"SERVER_CORS_OPTIONS_PASSTHROUGH"`
-}
-
-// contextKey is a value for use with context.WithValue. It's used as
-// a pointer so it fits in an interface{} without allocation. This technique
-// for defining context keys was copied from Go 1.7's new use of context in net/http.
-type contextKey struct {
-	name string
-}
-
-// NewContextKey creates a new context key.
-func NewContextKey(name string) *contextKey {
-	return &contextKey{name}
-}
-
-func (k *contextKey) String() string {
-	return "context value " + k.name
 }
