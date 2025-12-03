@@ -25,7 +25,7 @@ func NewRouter(envVars ServerConfig, logger *slog.Logger) *chi.Mux {
 	router.Use(middleware.RealIP)
 
 	if envVars.RequestTimeout > 0 {
-		router.Use(middleware.Timeout(envVars.RequestTimeout))
+		router.Use(middleware.Timeout(time.Duration(envVars.RequestTimeout)))
 	}
 
 	if envVars.CompressionLevel > 0 {
@@ -36,15 +36,15 @@ func NewRouter(envVars ServerConfig, logger *slog.Logger) *chi.Mux {
 		router.Use(MaxBodySizeMiddleware(envVars.MaxBodyKilobytes))
 	}
 
-	if len(envVars.CorsAllowedOrigins) > 0 {
+	if envVars.CORS != nil && len(envVars.CORS.AllowedOrigins) > 0 {
 		router.Use(cors.Handler(cors.Options{
-			AllowedOrigins:     envVars.CorsAllowedOrigins,
-			AllowedMethods:     envVars.CorsAllowedMethods,
-			AllowedHeaders:     envVars.CorsAllowedHeaders,
-			ExposedHeaders:     envVars.CorsExposedHeaders,
-			AllowCredentials:   envVars.CorsAllowCredentials,
-			MaxAge:             envVars.CorsMaxAge,
-			OptionsPassthrough: envVars.CorsOptionsPassthrough,
+			AllowedOrigins:     envVars.CORS.AllowedOrigins,
+			AllowedMethods:     envVars.CORS.AllowedMethods,
+			AllowedHeaders:     envVars.CORS.AllowedHeaders,
+			ExposedHeaders:     envVars.CORS.ExposedHeaders,
+			AllowCredentials:   envVars.CORS.AllowCredentials,
+			MaxAge:             envVars.CORS.MaxAge,
+			OptionsPassthrough: envVars.CORS.OptionsPassthrough,
 			Debug:              logger.Enabled(context.TODO(), slog.LevelDebug),
 		}))
 	}
@@ -97,10 +97,10 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) 
 			return ctx
 		},
 		Handler:           router,
-		ReadTimeout:       envVars.ReadTimeout,
-		ReadHeaderTimeout: envVars.ReadHeaderTimeout,
-		WriteTimeout:      envVars.WriteTimeout,
-		IdleTimeout:       envVars.IdleTimeout,
+		ReadTimeout:       time.Duration(envVars.ReadTimeout),
+		ReadHeaderTimeout: time.Duration(envVars.ReadHeaderTimeout),
+		WriteTimeout:      time.Duration(envVars.WriteTimeout),
+		IdleTimeout:       time.Duration(envVars.IdleTimeout),
 		MaxHeaderBytes:    maxHeaderBytes,
 	}
 

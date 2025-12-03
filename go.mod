@@ -7,7 +7,7 @@ require (
 	github.com/go-chi/cors v1.2.2
 	github.com/google/uuid v1.6.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/relychan/goutils v0.0.0-20251121111319-b810d743c7c5
+	github.com/relychan/goutils v0.0.0-20251126052335-b9b7ec5a4db1
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0
 )
