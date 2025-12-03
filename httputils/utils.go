@@ -1,3 +1,4 @@
+// Package httputils defines common functions to manipulate the HTTP server.
 package httputils
 
 import (

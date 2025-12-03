@@ -37,7 +37,7 @@ type ServerConfig struct {
 	// The connection's read deadline is reset after reading the headers and the Handler can decide what is considered too slow for the body.
 	// If zero, the value of ReadTimeout is used. If negative, or if zero and ReadTimeout is zero or negative, there is no timeout.
 	ReadHeaderTimeout goutils.Duration `env:"SERVER_READ_HEADER_TIMEOUT" json:"readHeaderTimeout,omitempty" yaml:"readHeaderTimeout,omitempty"`
-	// the maximum duration before timing out writes of the response. It is reset whenever a new request's header is read.
+	// The maximum duration before timing out writes of the response. It is reset whenever a new request's header is read.
 	// Like ReadTimeout, it does not let Handlers make decisions on a per-request basis.
 	// A zero or negative value means there will be no timeout.
 	WriteTimeout goutils.Duration `env:"SERVER_WRITE_TIMEOUT" json:"writeTimeout,omitempty" yaml:"writeTimeout,omitempty"`

@@ -14,7 +14,7 @@ import (
 func main() {
 	err := jsonSchemaConfiguration()
 	if err != nil {
-		panic(fmt.Errorf("failed to write jsonschema for RelyProxyAPIDocument: %w", err))
+		panic(fmt.Errorf("failed to write jsonschema for ServerConfig: %w", err))
 	}
 }
 

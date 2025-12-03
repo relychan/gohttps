@@ -22,7 +22,7 @@ func Decompress(next http.Handler) http.Handler {
 
 		requestEncodings := r.Header["Content-Encoding"]
 		// skip check for empty content body or no Content-Encoding
-		if r.ContentLength == 0 {
+		if r.ContentLength == 0 || len(requestEncodings) == 0 {
 			next.ServeHTTP(w, r)
 
 			return
