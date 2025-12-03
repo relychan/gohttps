@@ -6,7 +6,9 @@ require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/cors v1.2.2
 	github.com/google/uuid v1.6.0
+	github.com/klauspost/compress v1.18.2
 	github.com/prometheus/client_golang v1.23.2
+	github.com/relychan/gocompress v0.1.1
 	github.com/relychan/goutils v0.0.0-20251126052335-b9b7ec5a4db1
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0

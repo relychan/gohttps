@@ -1,4 +1,4 @@
-package gohttps
+package httputils
 
 import (
 	"encoding/json"
@@ -107,7 +107,7 @@ func DecodeRequestBody[T any](
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
-			logger := getRequestLogger(r)
+			logger := GetRequestLogger(r)
 			logger.Error("failed to write response", slog.String("error", wErr.Error()))
 			SetWriteResponseErrorAttribute(span, wErr)
 		}
@@ -122,7 +122,7 @@ func DecodeRequestBody[T any](
 		span.SetStatus(codes.Error, "failed to decode JSON")
 		span.RecordError(err)
 
-		logger := getRequestLogger(r)
+		logger := GetRequestLogger(r)
 		logger.Debug("failed to decode JSON", slog.String("error", err.Error()))
 
 		respError := goutils.NewBadRequestError()
@@ -180,7 +180,8 @@ func GetURLParamInt64(r *http.Request, param string) (int64, error) {
 	return value, nil
 }
 
-func getRequestLogger(r *http.Request) *slog.Logger {
+// GetRequestLogger gets the logger from request with request_id.
+func GetRequestLogger(r *http.Request) *slog.Logger {
 	return slog.Default().With(slog.String("request_id", getRequestID(r)))
 }
 

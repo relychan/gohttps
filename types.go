@@ -27,7 +27,7 @@ type ServerConfig struct {
 	// Level of the logger.
 	LogLevel string `env:"LOG_LEVEL" envDefault:"INFO" json:"logLevel,omitempty" yaml:"logLevel,omitempty" jsonschema:"enum=INFO,enum=DEBUG,enum=WARN,enum=ERROR"`
 	// Default level which the server uses to compress response bodies.
-	CompressionLevel int `env:"SERVER_COMPRESSION_LEVEL" json:"compressionLevel,omitempty" yaml:"compressionLevel,omitempty" jsonschema:"min=0"`
+	CompressionLevel *int `env:"SERVER_COMPRESSION_LEVEL" json:"compressionLevel,omitempty" yaml:"compressionLevel,omitempty" jsonschema:"min=-1,max=9"`
 	// The default timeout of every request. Return a 504 Gateway Timeout error to the client.
 	RequestTimeout goutils.Duration `env:"SERVER_REQUEST_TIMEOUT" json:"requestTimeout,omitempty" yaml:"requestTimeout,omitempty"`
 	// The maximum duration for reading the entire request, including the body.

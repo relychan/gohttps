@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/relychan/gohttps/middlewares"
 )
 
 // NewRouter creates a new router with default middlewares.
@@ -23,6 +24,7 @@ func NewRouter(config *ServerConfig, logger *slog.Logger) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.RealIP)
+	router.Use(middlewares.Decompress)
 
 	if config == nil {
 		return router
@@ -32,12 +34,16 @@ func NewRouter(config *ServerConfig, logger *slog.Logger) *chi.Mux {
 		router.Use(middleware.Timeout(time.Duration(config.RequestTimeout)))
 	}
 
-	if config.CompressionLevel > 0 {
-		router.Use(middleware.Compress(config.CompressionLevel))
+	compressionLevel := 1
+
+	if config.CompressionLevel != nil {
+		compressionLevel = *config.CompressionLevel
 	}
 
+	router.Use(middlewares.Compress(compressionLevel))
+
 	if config.MaxBodyKilobytes > 0 {
-		router.Use(MaxBodySizeMiddleware(config.MaxBodyKilobytes))
+		router.Use(middlewares.MaxBodySize(config.MaxBodyKilobytes))
 	}
 
 	if config.CORS != nil && len(config.CORS.AllowedOrigins) > 0 {
