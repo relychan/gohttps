@@ -19,32 +19,36 @@ import (
 )
 
 // NewRouter creates a new router with default middlewares.
-func NewRouter(envVars ServerConfig, logger *slog.Logger) *chi.Mux {
+func NewRouter(config *ServerConfig, logger *slog.Logger) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.RealIP)
 
-	if envVars.RequestTimeout > 0 {
-		router.Use(middleware.Timeout(time.Duration(envVars.RequestTimeout)))
+	if config == nil {
+		return router
 	}
 
-	if envVars.CompressionLevel > 0 {
-		router.Use(middleware.Compress(envVars.CompressionLevel))
+	if config.RequestTimeout > 0 {
+		router.Use(middleware.Timeout(time.Duration(config.RequestTimeout)))
 	}
 
-	if envVars.MaxBodyKilobytes > 0 {
-		router.Use(MaxBodySizeMiddleware(envVars.MaxBodyKilobytes))
+	if config.CompressionLevel > 0 {
+		router.Use(middleware.Compress(config.CompressionLevel))
 	}
 
-	if envVars.CORS != nil && len(envVars.CORS.AllowedOrigins) > 0 {
+	if config.MaxBodyKilobytes > 0 {
+		router.Use(MaxBodySizeMiddleware(config.MaxBodyKilobytes))
+	}
+
+	if config.CORS != nil && len(config.CORS.AllowedOrigins) > 0 {
 		router.Use(cors.Handler(cors.Options{
-			AllowedOrigins:     envVars.CORS.AllowedOrigins,
-			AllowedMethods:     envVars.CORS.AllowedMethods,
-			AllowedHeaders:     envVars.CORS.AllowedHeaders,
-			ExposedHeaders:     envVars.CORS.ExposedHeaders,
-			AllowCredentials:   envVars.CORS.AllowCredentials,
-			MaxAge:             envVars.CORS.MaxAge,
-			OptionsPassthrough: envVars.CORS.OptionsPassthrough,
+			AllowedOrigins:     config.CORS.AllowedOrigins,
+			AllowedMethods:     config.CORS.AllowedMethods,
+			AllowedHeaders:     config.CORS.AllowedHeaders,
+			ExposedHeaders:     config.CORS.ExposedHeaders,
+			AllowCredentials:   config.CORS.AllowCredentials,
+			MaxAge:             config.CORS.MaxAge,
+			OptionsPassthrough: config.CORS.OptionsPassthrough,
 			Debug:              logger.Enabled(context.TODO(), slog.LevelDebug),
 		}))
 	}
@@ -53,7 +57,11 @@ func NewRouter(envVars ServerConfig, logger *slog.Logger) *chi.Mux {
 }
 
 // ListenAndServe listens and serves the HTTP server.
-func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) error {
+func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) error {
+	if config == nil {
+		return errServerConfigRequired
+	}
+
 	router.Get(pathHealthz, func(w http.ResponseWriter, _ *http.Request) {
 		_, err := w.Write([]byte("OK"))
 		if err != nil {
@@ -64,7 +72,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) 
 	serverErr := make(chan error, 1)
 
 	// setup prometheus handler if enabled
-	promServer, err := CreatePrometheusServer(router, envVars.Port)
+	promServer, err := CreatePrometheusServer(router, config.Port)
 	if err != nil {
 		return err
 	}
@@ -87,29 +95,29 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) 
 
 	maxHeaderBytes := http.DefaultMaxHeaderBytes
 
-	if envVars.MaxHeaderKilobytes > 0 {
-		maxHeaderBytes = envVars.MaxHeaderKilobytes * kilobyte
+	if config.MaxHeaderKilobytes > 0 {
+		maxHeaderBytes = config.MaxHeaderKilobytes * kilobyte
 	}
 
 	server := http.Server{
-		Addr: fmt.Sprintf(":%d", envVars.Port),
+		Addr: fmt.Sprintf(":%d", config.Port),
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
 		Handler:           router,
-		ReadTimeout:       time.Duration(envVars.ReadTimeout),
-		ReadHeaderTimeout: time.Duration(envVars.ReadHeaderTimeout),
-		WriteTimeout:      time.Duration(envVars.WriteTimeout),
-		IdleTimeout:       time.Duration(envVars.IdleTimeout),
+		ReadTimeout:       time.Duration(config.ReadTimeout),
+		ReadHeaderTimeout: time.Duration(config.ReadHeaderTimeout),
+		WriteTimeout:      time.Duration(config.WriteTimeout),
+		IdleTimeout:       time.Duration(config.IdleTimeout),
 		MaxHeaderBytes:    maxHeaderBytes,
 	}
 
 	go func() {
 		var err error
 
-		if envVars.TLSCertFile != "" || envVars.TLSKeyFile != "" {
+		if config.TLSCertFile != "" || config.TLSKeyFile != "" {
 			slog.Info("Listening server and serving TLS on " + server.Addr)
-			err = server.ListenAndServeTLS(envVars.TLSCertFile, envVars.TLSKeyFile)
+			err = server.ListenAndServeTLS(config.TLSCertFile, config.TLSKeyFile)
 		} else {
 			slog.Info("Listening server on " + server.Addr)
 			err = server.ListenAndServe()

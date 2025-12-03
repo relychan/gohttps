@@ -10,14 +10,15 @@ import (
 	"github.com/hasura/gotel"
 	"github.com/hasura/gotel/otelutils"
 	"github.com/relychan/gohttps"
+	"github.com/relychan/goutils"
 )
 
 func main() {
 	os.Setenv("OTEL_METRIC_EXPORT_INTERVAL", "1000")
 
-	serverConfig := gohttps.ServerConfig{
-		LogLevel: "INFO",
-		Port:     8080,
+	serverConfig, err := goutils.ReadJSONOrYAMLFile[gohttps.ServerConfig]("config.yaml")
+	if err != nil {
+		panic(err)
 	}
 
 	logger, _, err := otelutils.NewJSONLogger(serverConfig.LogLevel)

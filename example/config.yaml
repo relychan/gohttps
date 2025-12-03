@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=../jsonschema/server.schema.json
+logLevel: INFO
+port: 8080
+cors:
+  allowedOrigins:
+    - "*"
