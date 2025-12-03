@@ -39,6 +39,7 @@
     },
     "maxAge": {
      "type": "integer",
+     "minimum": 0,
      "description": "MaxAge indicates how long (in seconds) the results of a preflight request can be cached"
     },
     "optionsPassthrough": {
@@ -49,6 +50,11 @@
    "additionalProperties": false,
    "type": "object",
    "description": "CORSConfig represents configurations of CORS."
+  },
+  "Duration": {
+   "type": "string",
+   "pattern": "^((([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h))$",
+   "description": "Duration string"
   },
   "ServerConfig": {
    "properties": {
@@ -68,26 +74,28 @@
     },
     "compressionLevel": {
      "type": "integer",
+     "maximum": 9,
+     "minimum": -1,
      "description": "Default level which the server uses to compress response bodies."
     },
     "requestTimeout": {
-     "type": "integer",
+     "$ref": "#/$defs/Duration",
      "description": "The default timeout of every request. Return a 504 Gateway Timeout error to the client."
     },
     "readTimeout": {
-     "type": "integer",
+     "$ref": "#/$defs/Duration",
      "description": "The maximum duration for reading the entire request, including the body.\nA zero or negative value means there will be no timeout."
     },
     "readHeaderTimeout": {
-     "type": "integer",
+     "$ref": "#/$defs/Duration",
      "description": "The amount of time allowed to read request headers.\nThe connection's read deadline is reset after reading the headers and the Handler can decide what is considered too slow for the body.\nIf zero, the value of ReadTimeout is used. If negative, or if zero and ReadTimeout is zero or negative, there is no timeout."
     },
     "writeTimeout": {
-     "type": "integer",
-     "description": "the maximum duration before timing out writes of the response. It is reset whenever a new request's header is read.\nLike ReadTimeout, it does not let Handlers make decisions on a per-request basis.\nA zero or negative value means there will be no timeout."
+     "$ref": "#/$defs/Duration",
+     "description": "The maximum duration before timing out writes of the response. It is reset whenever a new request's header is read.\nLike ReadTimeout, it does not let Handlers make decisions on a per-request basis.\nA zero or negative value means there will be no timeout."
     },
     "idleTimeout": {
-     "type": "integer",
+     "$ref": "#/$defs/Duration",
      "description": "The maximum amount of time to wait for the next request when keep-alives are enabled.\nIf zero, the value of ReadTimeout is used.\nIf negative, or if zero and ReadTimeout is zero or negative, there is no timeout."
     },
     "maxHeaderKilobytes": {

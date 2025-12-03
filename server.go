@@ -40,7 +40,10 @@ func NewRouter(config *ServerConfig, logger *slog.Logger) *chi.Mux {
 		compressionLevel = *config.CompressionLevel
 	}
 
-	router.Use(middlewares.Compress(compressionLevel))
+	// Only apply compression if level is -1 or between 1 and 9 (skip if 0 or invalid)
+	if compressionLevel == -1 || (compressionLevel >= 1 && compressionLevel <= 9) {
+		router.Use(middlewares.Compress(compressionLevel))
+	}
 
 	if config.MaxBodyKilobytes > 0 {
 		router.Use(middlewares.MaxBodySize(config.MaxBodyKilobytes))

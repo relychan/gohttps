@@ -25,8 +25,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3 h1:NmZ1PKzSTQbuGHw9DGPFomqkkLW
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3/go.mod h1:zQrxl1YP88HQlA6i9c63DSVPFklWpGX4OWAc9bFuaH4=
 github.com/hasura/gotel v0.4.3 h1:+RzDCufGBQiUR0zENnZ2dh/4bmrPCWgW3T/8JC1MrDg=
 github.com/hasura/gotel v0.4.3/go.mod h1:d/veuJD8nyYwRwxmAIZeJk62sFJ+EgC5ewACiLPBOp4=
-github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
-github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
+github.com/klauspost/compress v1.18.2 h1:iiPHWW0YrcFgpBYhsA6D1+fqHssJscY/Tm/y2Uqnapk=
+github.com/klauspost/compress v1.18.2/go.mod h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
@@ -47,6 +47,8 @@ github.com/prometheus/otlptranslator v1.0.0 h1:s0LJW/iN9dkIH+EnhiD3BlkkP5QVIUVEo
 github.com/prometheus/otlptranslator v1.0.0/go.mod h1:vRYWnXvI6aWGpsdY/mOT/cbeVRBlPWtBNDb7kGR3uKM=
 github.com/prometheus/procfs v0.19.2 h1:zUMhqEW66Ex7OXIiDkll3tl9a1ZdilUOd/F6ZXw4Vws=
 github.com/prometheus/procfs v0.19.2/go.mod h1:M0aotyiemPhBCM0z5w87kL22CxfcH05ZpYlu+b4J7mw=
+github.com/relychan/gocompress v0.1.1 h1:1IjIj4KLGc3LJwpT7otlfMDMBEGzc9FDDUW1OuATEIg=
+github.com/relychan/gocompress v0.1.1/go.mod h1:1O88NmUt+1Ioi+7v8l5Gm65vFSDMSTOgB4dkSuGpGE8=
 github.com/relychan/goutils v0.0.0-20251126052335-b9b7ec5a4db1 h1:LsT/oV5mfBEOO5rNIfuPId5yAIjk4dsbXGcwTWAMEMc=
 github.com/relychan/goutils v0.0.0-20251126052335-b9b7ec5a4db1/go.mod h1:EujSfQanq+VjRhVkUEek+WtsIvmnrVMHgmrdIe1FnxM=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=

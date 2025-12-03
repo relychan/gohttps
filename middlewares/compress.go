@@ -15,10 +15,7 @@ import (
 // body of a given content types to a data format based
 // on Accept-Encoding request header. It uses a given
 // compression level.
-//
-// # This middleware replaces default encoders with klaupost
-//
-// Passing a compression level of 5 is sensible value.
+// This middleware replaces default encoders with klauspost.
 func Compress(level int, types ...string) func(next http.Handler) http.Handler {
 	c := middleware.NewCompressor(level, types...)
 

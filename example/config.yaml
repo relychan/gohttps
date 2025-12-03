@@ -1,6 +1,18 @@
 # yaml-language-server: $schema=../jsonschema/server.schema.json
 logLevel: INFO
 port: 8080
+idleTimeout: 5s
+readHeaderTimeout: 1s
+readTimeout: 5s
+requestTimeout: 30s
+writeTimeout: 10s
+compressionLevel: 1
+maxBodyKilobytes: 1024
+maxHeaderKilobytes: 10
 cors:
   allowedOrigins:
     - "*"
+  allowCredentials: true
+  optionsPassthrough: true
+  allowedHeaders: []
+  maxAge: 3600
