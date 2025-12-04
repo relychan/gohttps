@@ -38,7 +38,7 @@ func jsonSchemaConfiguration() error {
 		Type:        "string",
 		Description: "Duration string",
 		MinLength:   goutils.ToPtr(uint64(2)),
-		Pattern:     `^(-?\d+(\.\d+)?h)?(-?\d+(\.\d+)?m)?(-?\d+(\.\d+)?s)?(-?\d+(\.\d+)?ms)?$`,
+		Pattern:     `^(\d+(\.\d+)?h)?(\d+(\.\d+)?m)?(\d+(\.\d+)?s)?(\d+(\.\d+)?ms)?$`,
 	}
 
 	reflectSchema.Definitions["ServerConfig"].Properties.Set("requestTimeout", &jsonschema.Schema{

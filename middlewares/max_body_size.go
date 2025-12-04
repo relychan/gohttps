@@ -18,7 +18,7 @@ func MaxBodySize(maxBodySizeKilobytes int) func(http.Handler) http.Handler {
 
 		maxBodySize := int64(maxBodySizeKilobytes * 1024)
 
-		errorMessage := fmt.Sprintf("Request body size exceeded %d KB(s)", maxBodySizeKilobytes)
+		errorMessage := fmt.Sprintf("Request body size exceeded %d KB", maxBodySizeKilobytes)
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Body == nil || r.Body == http.NoBody {
@@ -27,7 +27,7 @@ func MaxBodySize(maxBodySizeKilobytes int) func(http.Handler) http.Handler {
 				return
 			}
 
-			if r.ContentLength >= maxBodySize {
+			if r.ContentLength > maxBodySize {
 				statusCode := http.StatusRequestEntityTooLarge
 				body := goutils.RFC9457Error{
 					Type:     "about:blank",
