@@ -16,35 +16,48 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/relychan/gohttps/middlewares"
 )
 
 // NewRouter creates a new router with default middlewares.
-func NewRouter(envVars ServerConfig, logger *slog.Logger) *chi.Mux {
+func NewRouter(config *ServerConfig, logger *slog.Logger) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.RealIP)
+	router.Use(middlewares.Decompress)
 
-	if envVars.RequestTimeout > 0 {
-		router.Use(middleware.Timeout(envVars.RequestTimeout))
+	if config == nil {
+		return router
 	}
 
-	if envVars.CompressionLevel > 0 {
-		router.Use(middleware.Compress(envVars.CompressionLevel))
+	if config.RequestTimeout > 0 {
+		router.Use(middleware.Timeout(time.Duration(config.RequestTimeout)))
 	}
 
-	if envVars.MaxBodyKilobytes > 0 {
-		router.Use(MaxBodySizeMiddleware(envVars.MaxBodyKilobytes))
+	compressionLevel := 1
+
+	if config.CompressionLevel != nil {
+		compressionLevel = *config.CompressionLevel
 	}
 
-	if len(envVars.CorsAllowedOrigins) > 0 {
+	// Only apply compression if level is -1 or between 1 and 9 (skip if 0 or invalid)
+	if compressionLevel == -1 || (compressionLevel >= 1 && compressionLevel <= 9) {
+		router.Use(middlewares.Compress(compressionLevel))
+	}
+
+	if config.MaxBodyKilobytes > 0 {
+		router.Use(middlewares.MaxBodySize(config.MaxBodyKilobytes))
+	}
+
+	if config.CORS != nil && len(config.CORS.AllowedOrigins) > 0 {
 		router.Use(cors.Handler(cors.Options{
-			AllowedOrigins:     envVars.CorsAllowedOrigins,
-			AllowedMethods:     envVars.CorsAllowedMethods,
-			AllowedHeaders:     envVars.CorsAllowedHeaders,
-			ExposedHeaders:     envVars.CorsExposedHeaders,
-			AllowCredentials:   envVars.CorsAllowCredentials,
-			MaxAge:             envVars.CorsMaxAge,
-			OptionsPassthrough: envVars.CorsOptionsPassthrough,
+			AllowedOrigins:     config.CORS.AllowedOrigins,
+			AllowedMethods:     config.CORS.AllowedMethods,
+			AllowedHeaders:     config.CORS.AllowedHeaders,
+			ExposedHeaders:     config.CORS.ExposedHeaders,
+			AllowCredentials:   config.CORS.AllowCredentials,
+			MaxAge:             config.CORS.MaxAge,
+			OptionsPassthrough: config.CORS.OptionsPassthrough,
 			Debug:              logger.Enabled(context.TODO(), slog.LevelDebug),
 		}))
 	}
@@ -53,7 +66,11 @@ func NewRouter(envVars ServerConfig, logger *slog.Logger) *chi.Mux {
 }
 
 // ListenAndServe listens and serves the HTTP server.
-func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) error {
+func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) error {
+	if config == nil {
+		return errServerConfigRequired
+	}
+
 	router.Get(pathHealthz, func(w http.ResponseWriter, _ *http.Request) {
 		_, err := w.Write([]byte("OK"))
 		if err != nil {
@@ -64,7 +81,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) 
 	serverErr := make(chan error, 1)
 
 	// setup prometheus handler if enabled
-	promServer, err := CreatePrometheusServer(router, envVars.Port)
+	promServer, err := CreatePrometheusServer(router, config.Port)
 	if err != nil {
 		return err
 	}
@@ -87,29 +104,29 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, envVars ServerConfig) 
 
 	maxHeaderBytes := http.DefaultMaxHeaderBytes
 
-	if envVars.MaxHeaderKilobytes > 0 {
-		maxHeaderBytes = envVars.MaxHeaderKilobytes * kilobyte
+	if config.MaxHeaderKilobytes > 0 {
+		maxHeaderBytes = config.MaxHeaderKilobytes * kilobyte
 	}
 
 	server := http.Server{
-		Addr: fmt.Sprintf(":%d", envVars.Port),
+		Addr: fmt.Sprintf(":%d", config.Port),
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
 		Handler:           router,
-		ReadTimeout:       envVars.ReadTimeout,
-		ReadHeaderTimeout: envVars.ReadHeaderTimeout,
-		WriteTimeout:      envVars.WriteTimeout,
-		IdleTimeout:       envVars.IdleTimeout,
+		ReadTimeout:       time.Duration(config.ReadTimeout),
+		ReadHeaderTimeout: time.Duration(config.ReadHeaderTimeout),
+		WriteTimeout:      time.Duration(config.WriteTimeout),
+		IdleTimeout:       time.Duration(config.IdleTimeout),
 		MaxHeaderBytes:    maxHeaderBytes,
 	}
 
 	go func() {
 		var err error
 
-		if envVars.TLSCertFile != "" || envVars.TLSKeyFile != "" {
+		if config.TLSCertFile != "" || config.TLSKeyFile != "" {
 			slog.Info("Listening server and serving TLS on " + server.Addr)
-			err = server.ListenAndServeTLS(envVars.TLSCertFile, envVars.TLSKeyFile)
+			err = server.ListenAndServeTLS(config.TLSCertFile, config.TLSKeyFile)
 		} else {
 			slog.Info("Listening server on " + server.Addr)
 			err = server.ListenAndServe()
