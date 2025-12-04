@@ -134,9 +134,8 @@ func TestMaxBodySize(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		}))
 
-		exactBody := strings.Repeat("a", 1024)
+		exactBody := strings.Repeat("a", 1025)
 		req := httptest.NewRequest("POST", "/test", bytes.NewReader([]byte(exactBody)))
-		req.ContentLength = 1024
 		w := httptest.NewRecorder()
 
 		handler.ServeHTTP(w, req)
