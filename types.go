@@ -23,9 +23,9 @@ var (
 // ServerConfig holds information of required environment variables.
 type ServerConfig struct {
 	// The port where the server is listening to.
-	Port int `env:"PORT" envDefault:"8080" json:"port,omitempty" yaml:"port,omitempty"`
+	Port int `env:"PORT" json:"port,omitempty" yaml:"port,omitempty" jsonschema:"default=8080,minimum=1000,maximum=65535"`
 	// Level of the logger.
-	LogLevel string `env:"LOG_LEVEL" envDefault:"INFO" json:"logLevel,omitempty" yaml:"logLevel,omitempty" jsonschema:"enum=INFO,enum=DEBUG,enum=WARN,enum=ERROR"`
+	LogLevel string `env:"LOG_LEVEL" json:"logLevel,omitempty" yaml:"logLevel,omitempty" jsonschema:"enum=INFO,enum=DEBUG,enum=WARN,enum=ERROR,default=INFO"`
 	// Default level which the server uses to compress response bodies.
 	CompressionLevel *int `env:"SERVER_COMPRESSION_LEVEL" json:"compressionLevel,omitempty" yaml:"compressionLevel,omitempty" jsonschema:"minimum=-1,maximum=9"`
 	// The default timeout of every request. Return a 504 Gateway Timeout error to the client.
@@ -57,6 +57,24 @@ type ServerConfig struct {
 	TLSKeyFile string `env:"SERVER_TLS_KEY_FILE" json:"tlsKeyFile,omitempty" yaml:"tlsKeyFile,omitempty"`
 	// The configuration container to setup the CORS middleware.
 	CORS *CORSConfig `json:"cors,omitempty" yaml:"cors,omitempty"`
+}
+
+// GetPort returns the port of server. Default is 8080.
+func (sc ServerConfig) GetPort() int {
+	if sc.Port > 0 {
+		return sc.Port
+	}
+
+	return 8080
+}
+
+// GetLogLevel returns the log level. Default is INFO.
+func (sc ServerConfig) GetLogLevel() string {
+	if sc.LogLevel != "" {
+		return sc.LogLevel
+	}
+
+	return "INFO"
 }
 
 // CORSConfig represents configurations of CORS.
