@@ -61,7 +61,7 @@ type ServerConfig struct {
 
 // GetPort returns the port of server. Default is 8080.
 func (sc ServerConfig) GetPort() int {
-	if sc.Port > 0 {
+	if sc.Port >= 1000 && sc.Port <= 65535 {
 		return sc.Port
 	}
 
