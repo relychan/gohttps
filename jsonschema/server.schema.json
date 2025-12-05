@@ -61,7 +61,10 @@
    "properties": {
     "port": {
      "type": "integer",
-     "description": "The port where the server is listening to."
+     "maximum": 65535,
+     "minimum": 1000,
+     "description": "The port where the server is listening to.",
+     "default": 8080
     },
     "logLevel": {
      "type": "string",
@@ -71,7 +74,8 @@
       "WARN",
       "ERROR"
      ],
-     "description": "Level of the logger."
+     "description": "Level of the logger.",
+     "default": "INFO"
     },
     "compressionLevel": {
      "type": "integer",
