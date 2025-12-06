@@ -21,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	logger, _, err := otelutils.NewJSONLogger(serverConfig.LogLevel)
+	logger, _, err := otelutils.NewJSONLogger(serverConfig.GetLogLevel())
 	if err != nil {
 		log.Fatalf("failed to initialize logger: %s", err)
 	}
