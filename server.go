@@ -81,7 +81,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) 
 	serverErr := make(chan error, 1)
 
 	// setup prometheus handler if enabled
-	promServer, err := CreatePrometheusServer(router, config.Port)
+	promServer, err := CreatePrometheusServer(router, config.GetPort())
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) 
 	}
 
 	server := http.Server{
-		Addr: fmt.Sprintf(":%d", config.Port),
+		Addr: fmt.Sprintf(":%d", config.GetPort()),
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
