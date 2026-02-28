@@ -16,7 +16,7 @@ import (
 func main() {
 	os.Setenv("OTEL_METRIC_EXPORT_INTERVAL", "1000")
 
-	serverConfig, err := goutils.ReadJSONOrYAMLFile[gohttps.ServerConfig]("config.yaml")
+	serverConfig, err := goutils.ReadJSONOrYAMLFile[gohttps.ServerConfig](context.Background(), "config.yaml")
 	if err != nil {
 		panic(err)
 	}
