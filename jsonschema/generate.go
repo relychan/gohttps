@@ -9,7 +9,6 @@ import (
 
 	"github.com/invopop/jsonschema"
 	"github.com/relychan/gohttps"
-	"github.com/relychan/goutils"
 )
 
 func main() {
@@ -37,7 +36,7 @@ func jsonSchemaConfiguration() error {
 	reflectSchema.Definitions["Duration"] = &jsonschema.Schema{
 		Type:        "string",
 		Description: "Duration string",
-		MinLength:   goutils.ToPtr(uint64(2)),
+		MinLength:   new(uint64(2)),
 		Pattern:     `^(\d+(\.\d+)?h)?(\d+(\.\d+)?m)?(\d+(\.\d+)?s)?(\d+(\.\d+)?ms)?$`,
 	}
 
