@@ -9,9 +9,9 @@ require (
 	github.com/klauspost/compress v1.18.4
 	github.com/prometheus/client_golang v1.23.2
 	github.com/relychan/gocompress v0.1.2
-	github.com/relychan/goutils v0.0.0-20260301074023-2eb673a4894e
-	go.opentelemetry.io/otel v1.40.0
-	go.opentelemetry.io/otel/trace v1.40.0
+	github.com/relychan/goutils v0.0.0-20260303101739-0530dc9e1fb4
+	go.opentelemetry.io/otel v1.41.0
+	go.opentelemetry.io/otel/trace v1.41.0
 )
 
 require (
