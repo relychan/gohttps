@@ -170,7 +170,7 @@ func CreatePrometheusServer(router *chi.Mux, currentPort int) (*http.Server, err
 
 		promServer := createPrometheusServerInternal(prometheusPort)
 
-		slog.Info( //nolint:gosec
+		slog.Info(
 			fmt.Sprintf("Listening prometheus server on %d", prometheusPort),
 		)
 
