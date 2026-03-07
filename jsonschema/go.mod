@@ -23,12 +23,12 @@ require (
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/relychan/gocompress v0.1.2 // indirect
-	github.com/relychan/goutils v0.0.0-20260301074023-2eb673a4894e // indirect
+	github.com/relychan/goutils v0.0.0-20260307050651-4562f8dd3658 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
-	go.opentelemetry.io/otel v1.40.0 // indirect
-	go.opentelemetry.io/otel/trace v1.40.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.3 // indirect
-	go.yaml.in/yaml/v4 v4.0.0-rc.4.0.20260301020847-9162c2211af3 // indirect
+	go.opentelemetry.io/otel v1.42.0 // indirect
+	go.opentelemetry.io/otel/trace v1.42.0 // indirect
+	go.yaml.in/yaml/v2 v2.4.4 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.4.0.20260301223609-d604f65988bf // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
