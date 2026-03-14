@@ -9,7 +9,7 @@ require (
 	github.com/klauspost/compress v1.18.4
 	github.com/prometheus/client_golang v1.23.2
 	github.com/relychan/gocompress v0.1.2
-	github.com/relychan/goutils v0.0.0-20260307050651-4562f8dd3658
+	github.com/relychan/goutils v0.0.0-20260314112334-2ca76d8ee0f6
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
 )
@@ -23,6 +23,6 @@ require (
 	github.com/prometheus/procfs v0.20.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.4.0.20260301223609-d604f65988bf // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
