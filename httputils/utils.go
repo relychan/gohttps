@@ -69,7 +69,7 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 
 	statusCode := http.StatusInternalServerError
 
-	if errors.As(err, &httpError) {
+	if errors.As(err, &httpError) && httpError != nil {
 		if httpError.Status > 0 {
 			statusCode = httpError.Status
 		}
