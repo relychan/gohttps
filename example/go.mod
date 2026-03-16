@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/hasura/gotel v0.6.0
 	github.com/relychan/gohttps v0.0.1
-	github.com/relychan/goutils v0.0.0-20260307050651-4562f8dd3658
+	github.com/relychan/goutils v0.0.0-20260315184030-c614e58d5a59
 )
 
 require (
@@ -48,7 +48,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.4.0.20260301223609-d604f65988bf // indirect
 	golang.org/x/net v0.51.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
