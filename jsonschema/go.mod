@@ -23,7 +23,7 @@ require (
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/relychan/gocompress v0.1.2 // indirect
-	github.com/relychan/goutils v0.0.0-20260314112334-2ca76d8ee0f6 // indirect
+	github.com/relychan/goutils v0.0.0-20260315184030-c614e58d5a59 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	go.opentelemetry.io/otel v1.42.0 // indirect
 	go.opentelemetry.io/otel/trace v1.42.0 // indirect
