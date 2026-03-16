@@ -65,7 +65,7 @@ func WriteResponseJSON(w http.ResponseWriter, statusCode int, body any) error {
 
 // WriteResponseError responds the error to the client.
 func WriteResponseError(w http.ResponseWriter, err error) error {
-	var httpError goutils.RFC9457Error
+	var httpError *goutils.RFC9457Error
 
 	statusCode := http.StatusInternalServerError
 
@@ -77,6 +77,7 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 		return WriteResponseJSON(w, statusCode, httpError)
 	}
 
+	httpError = new(goutils.RFC9457Error)
 	httpError.Status = statusCode
 	httpError.Title = http.StatusText(statusCode)
 	httpError.Detail = err.Error()

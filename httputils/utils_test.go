@@ -80,7 +80,7 @@ func TestWriteResponseJSON(t *testing.T) {
 func TestWriteResponseError(t *testing.T) {
 	t.Run("write RFC9457 error", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		rfcErr := goutils.RFC9457Error{
+		rfcErr := &goutils.RFC9457Error{
 			Type:   "about:blank",
 			Title:  "Bad Request",
 			Status: http.StatusBadRequest,
