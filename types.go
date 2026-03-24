@@ -109,11 +109,11 @@ type CORSConfig struct {
 	AllowedHeaders []string `env:"SERVER_CORS_ALLOWED_HEADERS" json:"allowedHeaders,omitempty" yaml:"allowedHeaders,omitempty"`
 	// ExposedHeaders indicates which headers are safe to expose to the API of a CORS API specification
 	ExposedHeaders []string `env:"SERVER_CORS_EXPOSED_HEADERS" json:"exposedHeaders,omitempty" yaml:"exposedHeaders,omitempty"`
+	// MaxAge indicates how long (in seconds) the results of a preflight request can be cached
+	MaxAge int `env:"SERVER_CORS_MAX_AGE" json:"maxAge,omitempty" yaml:"maxAge,omitempty" jsonschema:"minimum=0"`
 	// AllowCredentials indicates whether the request can include user credentials like cookies,
 	// HTTP authentication or client side SSL certificates.
 	AllowCredentials bool `env:"SERVER_CORS_ALLOW_CREDENTIALS" json:"allowCredentials,omitempty" yaml:"allowCredentials"`
-	// MaxAge indicates how long (in seconds) the results of a preflight request can be cached
-	MaxAge int `env:"SERVER_CORS_MAX_AGE" json:"maxAge,omitempty" yaml:"maxAge,omitempty" jsonschema:"minimum=0"`
 	// OptionsPassthrough instructs preflight to let other potential next handlers to process the OPTIONS method.
 	// Turn this on if your application handles OPTIONS.
 	OptionsPassthrough bool `env:"SERVER_CORS_OPTIONS_PASSTHROUGH" json:"optionsPassthrough,omitempty" yaml:"optionsPassthrough,omitempty"`
