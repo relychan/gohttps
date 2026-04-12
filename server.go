@@ -101,7 +101,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) 
 	}
 
 	if promServer != nil {
-		defer func() {
+		defer func() { //nolint:contextcheck
 			err := promServer.Shutdown(context.Background())
 			if err != nil && !errors.Is(err, http.ErrServerClosed) {
 				slog.Warn("failed to shutdown prometheus server: " + err.Error())
@@ -160,7 +160,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) 
 		// Wait for first CTRL+C.
 		slog.Info("received the quit signal, exiting...")
 		// When Shutdown is called, ListenAndServe immediately returns ErrServerClosed.
-		return server.Shutdown(context.Background())
+		return server.Shutdown(context.Background()) //nolint:contextcheck
 	}
 }
 

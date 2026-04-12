@@ -20,7 +20,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"github.com/relychan/gocompress"
 	"github.com/relychan/gohttps/httputils"
@@ -30,7 +29,7 @@ import (
 
 // Decompress tries to decompress the request body if the Content-Encoding header is set.
 // Responds with a 415 Unsupported Media Type status if the content type is not supported.
-func Decompress(next http.Handler) http.Handler { //nolint:funlen
+func Decompress(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		if r.Body == nil || r.Body == http.NoBody {
 			next.ServeHTTP(w, r)
@@ -47,93 +46,131 @@ func Decompress(next http.Handler) http.Handler { //nolint:funlen
 		}
 
 		if len(requestEncodings) == 1 {
-			trimmedEncoding := strings.TrimSpace(strings.ToLower(requestEncodings[0]))
-
-			if !gocompress.DefaultCompressor.IsEncodingSupported(trimmedEncoding) {
-				respondUnsupportedContentEncoding(w, r)
-
-				return
-			}
-
-			decompressedBody, err := gocompress.DefaultCompressor.Decompress(
-				r.Body,
-				trimmedEncoding,
-			)
-			if err != nil {
-				respondDecompressionError(w, r, err)
-
-				return
-			}
-
-			r.Body = decompressedBody
-
-			next.ServeHTTP(w, r)
+			decompressContentEncoding(w, r, next, requestEncodings[0])
 
 			return
 		}
 
-		bodyBytes, err := io.ReadAll(r.Body)
-
-		goutils.CatchWarnErrorFunc(r.Body.Close)
-
-		if err != nil {
-			respondDecompressionError(w, r, err)
-
-			return
-		}
-
-		bodyReader := bytes.NewReader(bodyBytes)
-		isEncodingSupported := false
-
-		var decompressErr error
-
-		// All encodings in the request must be allowed
-		for i, encoding := range requestEncodings {
-			trimmedEncoding := strings.TrimSpace(strings.ToLower(encoding))
-
-			if !gocompress.DefaultCompressor.IsEncodingSupported(trimmedEncoding) {
-				continue
-			}
-
-			isEncodingSupported = true
-
-			if i > 0 {
-				_, err := bodyReader.Seek(0, io.SeekStart)
-				if err != nil {
-					respondDecompressionError(w, r, err)
-
-					return
-				}
-			}
-
-			decompressedBody, err := gocompress.DefaultCompressor.Decompress(
-				io.NopCloser(bodyReader),
-				trimmedEncoding,
-			)
-			if err != nil {
-				decompressErr = err
-
-				continue
-			}
-
-			r.Body = decompressedBody
-
-			next.ServeHTTP(w, r)
-
-			return
-		}
-
-		if isEncodingSupported {
-			respondDecompressionError(w, r, decompressErr)
-		} else {
-			respondUnsupportedContentEncoding(w, r)
-		}
+		decompressContentEncodingSlice(w, r, next, requestEncodings)
 	}
 
 	return http.HandlerFunc(fn)
 }
 
-func respondUnsupportedContentEncoding(w http.ResponseWriter, r *http.Request) {
+func decompressContentEncoding(
+	w http.ResponseWriter,
+	r *http.Request,
+	next http.Handler,
+	requestEncoding string,
+) {
+	logger := httputils.GetRequestLogger(r)
+
+	formats, err := gocompress.DefaultCompressor.ParseSupportedEncoding(requestEncoding)
+	if err != nil {
+		logger.Warn(
+			"error happened when parsing Content-Encoding",
+			slog.String("error", err.Error()),
+		)
+	}
+
+	if len(formats) == 0 {
+		respondUnsupportedContentEncoding(w, r, logger)
+
+		return
+	}
+
+	decompressedBody, err := gocompress.DefaultCompressor.DecompressFormat(
+		r.Body,
+		formats...,
+	)
+	if err != nil {
+		respondDecompressionError(w, r, err, logger)
+
+		return
+	}
+
+	r.Body = decompressedBody
+
+	next.ServeHTTP(w, r)
+}
+
+func decompressContentEncodingSlice(
+	w http.ResponseWriter,
+	r *http.Request,
+	next http.Handler,
+	requestEncodings []string,
+) {
+	logger := httputils.GetRequestLogger(r)
+
+	bodyBytes, err := io.ReadAll(r.Body)
+
+	goutils.CatchWarnErrorFunc(r.Body.Close)
+
+	if err != nil {
+		respondDecompressionError(w, r, err, logger)
+
+		return
+	}
+
+	bodyReader := bytes.NewReader(bodyBytes)
+	isEncodingSupported := false
+
+	var decompressErr error
+
+	// All encodings in the request must be allowed
+	for i, encoding := range requestEncodings {
+		formats, err := gocompress.DefaultCompressor.ParseSupportedEncoding(encoding)
+		if err != nil {
+			logger.Warn(
+				"error happened when parsing Content-Encoding",
+				slog.String("error", err.Error()),
+			)
+		}
+
+		if len(formats) == 0 {
+			continue
+		}
+
+		isEncodingSupported = true
+
+		if i > 0 {
+			_, err := bodyReader.Seek(0, io.SeekStart)
+			if err != nil {
+				respondDecompressionError(w, r, err, logger)
+
+				return
+			}
+		}
+
+		decompressedBody, err := gocompress.DefaultCompressor.DecompressFormat(
+			io.NopCloser(bodyReader),
+			formats...,
+		)
+		if err != nil {
+			decompressErr = err
+
+			continue
+		}
+
+		r.Body = decompressedBody
+
+		next.ServeHTTP(w, r)
+
+		return
+	}
+
+	if isEncodingSupported {
+		respondDecompressionError(w, r, decompressErr, logger)
+	} else {
+		respondUnsupportedContentEncoding(w, r, logger)
+	}
+}
+
+func respondUnsupportedContentEncoding(
+	w http.ResponseWriter,
+	r *http.Request,
+	logger *slog.Logger,
+) {
 	statusCode := http.StatusUnsupportedMediaType
 	body := goutils.NewRFC9457Error(
 		statusCode,
@@ -147,14 +184,19 @@ func respondUnsupportedContentEncoding(w http.ResponseWriter, r *http.Request) {
 
 	writeErr := httputils.WriteResponseJSON(w, statusCode, body)
 	if writeErr != nil {
-		httputils.GetRequestLogger(r).Error(
+		logger.Error(
 			"failed to write response",
 			slog.String("error", writeErr.Error()),
 		)
 	}
 }
 
-func respondDecompressionError(w http.ResponseWriter, r *http.Request, err error) {
+func respondDecompressionError(
+	w http.ResponseWriter,
+	r *http.Request,
+	err error,
+	logger *slog.Logger,
+) {
 	message := "failed to decompress body"
 
 	if err != nil {
@@ -168,7 +210,7 @@ func respondDecompressionError(w http.ResponseWriter, r *http.Request, err error
 
 	writeErr := httputils.WriteResponseJSON(w, body.Status, body)
 	if writeErr != nil {
-		httputils.GetRequestLogger(r).Error(
+		logger.Error(
 			"failed to write response",
 			slog.String("error", writeErr.Error()),
 		)
