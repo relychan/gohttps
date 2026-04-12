@@ -8,10 +8,10 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/klauspost/compress v1.18.5
 	github.com/prometheus/client_golang v1.23.2
-	github.com/relychan/gocompress v0.1.2
-	github.com/relychan/goutils v0.0.0-20260320085159-a456d46cc0d9
-	go.opentelemetry.io/otel v1.42.0
-	go.opentelemetry.io/otel/trace v1.42.0
+	github.com/relychan/gocompress v0.2.0
+	github.com/relychan/goutils v0.0.0-20260410181000-7cadbbfb748d
+	go.opentelemetry.io/otel v1.43.0
+	go.opentelemetry.io/otel/trace v1.43.0
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v4 v4.0.0-rc.4.0.20260301223609-d604f65988bf // indirect
-	golang.org/x/sys v0.42.0 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.4.0.20260405193028-802e24f4fbcc // indirect
+	golang.org/x/sys v0.43.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )

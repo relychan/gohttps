@@ -8,9 +8,7 @@ linters:
     - wrapcheck
     - wsl
     - mnd
-    - gochecknoglobals
     - nilnil
-    - contextcheck
   settings:
     depguard:
       rules:
