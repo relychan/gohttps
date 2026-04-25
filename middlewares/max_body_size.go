@@ -20,7 +20,7 @@ import (
 	"net/http"
 
 	"github.com/relychan/gohttps/httputils"
-	"github.com/relychan/goutils"
+	"github.com/relychan/goutils/httperror"
 )
 
 // MaxBodySize creates a middleware with the max body size validation.
@@ -43,7 +43,7 @@ func MaxBodySize(maxBodySizeKilobytes int) func(http.Handler) http.Handler {
 
 			if r.ContentLength > maxBodySize {
 				statusCode := http.StatusRequestEntityTooLarge
-				body := goutils.RFC9457Error{
+				body := httperror.HTTPError{
 					Type:     "about:blank",
 					Title:    http.StatusText(statusCode),
 					Detail:   errorMessage,

@@ -25,7 +25,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/relychan/goutils"
+	"github.com/relychan/goutils/httperror"
 	"github.com/relychan/goutils/httpheader"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -65,7 +65,7 @@ func WriteResponseJSON(w http.ResponseWriter, statusCode int, body any) error {
 
 // WriteResponseError responds the error to the client.
 func WriteResponseError(w http.ResponseWriter, err error) error {
-	var httpError *goutils.RFC9457Error
+	var httpError *httperror.HTTPError
 
 	statusCode := http.StatusInternalServerError
 
@@ -77,7 +77,7 @@ func WriteResponseError(w http.ResponseWriter, err error) error {
 		return WriteResponseJSON(w, statusCode, httpError)
 	}
 
-	httpError = new(goutils.RFC9457Error)
+	httpError = new(httperror.HTTPError)
 	httpError.Status = statusCode
 	httpError.Title = http.StatusText(statusCode)
 	httpError.Detail = err.Error()
@@ -119,7 +119,7 @@ func DecodeRequestBody[T any](
 		message := "request body is required"
 		span.SetStatus(codes.Error, message)
 
-		respError := goutils.NewBadRequestError()
+		respError := httperror.NewBadRequestError()
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
@@ -141,7 +141,7 @@ func DecodeRequestBody[T any](
 		logger := GetRequestLogger(r)
 		logger.Debug("failed to decode JSON", slog.String("error", err.Error()))
 
-		respError := goutils.NewBadRequestError()
+		respError := httperror.NewBadRequestError()
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
@@ -166,7 +166,7 @@ func GetURLParamUUID(r *http.Request, param string) (uuid.UUID, error) {
 
 	value, err := uuid.Parse(rawValue)
 	if err != nil {
-		respError := goutils.NewInvalidRequestParameterFormatError(goutils.ErrorDetail{
+		respError := httperror.NewInvalidRequestParameterFormatError(httperror.ValidationError{
 			Detail:    "Invalid UUID format",
 			Parameter: param,
 		})
@@ -184,7 +184,7 @@ func GetURLParamInt64(r *http.Request, param string) (int64, error) {
 
 	value, err := strconv.ParseInt(rawValue, 10, 64)
 	if err != nil {
-		respError := goutils.NewInvalidRequestParameterFormatError(goutils.ErrorDetail{
+		respError := httperror.NewInvalidRequestParameterFormatError(httperror.ValidationError{
 			Detail:    "Invalid integer format",
 			Parameter: param,
 		})

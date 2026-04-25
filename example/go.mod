@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/hasura/gotel v0.7.2
 	github.com/relychan/gohttps v0.0.1
-	github.com/relychan/goutils v0.0.0-20260410181000-7cadbbfb748d
+	github.com/relychan/goutils v0.0.0-20260424152002-b262b08e6c6e
 )
 
 require (
