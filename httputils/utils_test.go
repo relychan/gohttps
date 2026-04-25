@@ -25,7 +25,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/relychan/goutils"
+	"github.com/relychan/goutils/httperror"
 	"go.opentelemetry.io/otel/trace/noop"
 )
 
@@ -80,7 +80,7 @@ func TestWriteResponseJSON(t *testing.T) {
 func TestWriteResponseError(t *testing.T) {
 	t.Run("write RFC9457 error", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		rfcErr := &goutils.RFC9457Error{
+		rfcErr := &httperror.HTTPError{
 			Type:   "about:blank",
 			Title:  "Bad Request",
 			Status: http.StatusBadRequest,

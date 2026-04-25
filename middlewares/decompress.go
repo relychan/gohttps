@@ -24,6 +24,7 @@ import (
 	"github.com/relychan/gocompress"
 	"github.com/relychan/gohttps/httputils"
 	"github.com/relychan/goutils"
+	"github.com/relychan/goutils/httperror"
 	"github.com/relychan/goutils/httpheader"
 )
 
@@ -172,7 +173,7 @@ func respondUnsupportedContentEncoding(
 	logger *slog.Logger,
 ) {
 	statusCode := http.StatusUnsupportedMediaType
-	body := goutils.NewRFC9457Error(
+	body := httperror.NewHTTPError(
 		statusCode,
 		fmt.Sprintf(
 			"Content-Encoding %v is unsupported",
@@ -203,7 +204,7 @@ func respondDecompressionError(
 		message = err.Error()
 	}
 
-	body := goutils.NewBadRequestError(goutils.ErrorDetail{
+	body := httperror.NewBadRequestError(httperror.ValidationError{
 		Detail: message,
 	})
 	body.Instance = r.URL.Path
