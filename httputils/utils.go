@@ -116,10 +116,11 @@ func DecodeRequestBody[T any](
 	span trace.Span,
 ) (*T, bool) {
 	if r.Body == nil || r.Body == http.NoBody {
-		message := "request body is required"
+		message := "Request body is required"
 		span.SetStatus(codes.Error, message)
 
 		respError := httperror.NewBadRequestError()
+		respError.Detail = message
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
@@ -142,6 +143,7 @@ func DecodeRequestBody[T any](
 		logger.Debug("failed to decode JSON", slog.String("error", err.Error()))
 
 		respError := httperror.NewBadRequestError()
+		respError.Detail = "Malformed JSON"
 
 		wErr := WriteResponseJSON(w, respError.Status, respError)
 		if wErr != nil {
