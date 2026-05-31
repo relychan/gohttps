@@ -21,8 +21,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/invopop/jsonschema"
 	"github.com/relychan/gohttps"
-	"github.com/relychan/jsonschema"
 )
 
 func main() {

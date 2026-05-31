@@ -33,14 +33,14 @@
      "type": "array",
      "description": "ExposedHeaders indicates which headers are safe to expose to the API of a CORS API specification"
     },
-    "allowCredentials": {
-     "type": "boolean",
-     "description": "AllowCredentials indicates whether the request can include user credentials like cookies,\nHTTP authentication or client side SSL certificates."
-    },
     "maxAge": {
      "type": "integer",
      "minimum": 0,
      "description": "MaxAge indicates how long (in seconds) the results of a preflight request can be cached"
+    },
+    "allowCredentials": {
+     "type": "boolean",
+     "description": "AllowCredentials indicates whether the request can include user credentials like cookies,\nHTTP authentication or client side SSL certificates."
     },
     "optionsPassthrough": {
      "type": "boolean",

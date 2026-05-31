@@ -17,6 +17,7 @@ package gohttps
 import (
 	"errors"
 
+	"github.com/relychan/gohttps/middlewares"
 	"github.com/relychan/goutils"
 )
 
@@ -71,6 +72,8 @@ type ServerConfig struct {
 	TLSKeyFile string `env:"SERVER_TLS_KEY_FILE" json:"tlsKeyFile,omitempty" yaml:"tlsKeyFile,omitempty"`
 	// The configuration container to setup the CORS middleware.
 	CORS *CORSConfig `json:"cors,omitempty" yaml:"cors,omitempty"`
+	// The configuration container to setup the client IP middleware.
+	ClientIP *middlewares.ClientIPConfig `json:"clientIp,omitempty" yaml:"clientIp,omitempty"`
 }
 
 // GetPort returns the port of server. Default is 8080.
