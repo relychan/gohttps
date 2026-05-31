@@ -87,14 +87,14 @@ func (ClientIPConfig) JSONSchema() *jsonschema.Schema {
 			},
 			{
 				Title:       "ServerClientIPFromXForwardForConfig",
-				Description: "Configuration for client IP resolution from X-Forward-For header with trusted IP prefixes, walking the chain right-to-left and skipping any IP that falls within one of the given trusted CIDR prefixes.",
+				Description: "Configuration for client IP resolution from X-Forwarded-For header with trusted IP prefixes, walking the chain right-to-left and skipping any IP that falls within one of the given trusted CIDR prefixes.",
 				Type:        "object",
 				Properties:  xffProps,
 				Required:    []string{keyType, keyTrustedIPPrefixes},
 			},
 			{
 				Title:       "ServerClientIPFromXForwardForTrustedProxiesConfig",
-				Description: "Configuration for client IP resolution from X-Forward-For header given the exact number of trusted reverse proxies between this server and the public internet. It returns the IP at position len(xff) - numTrustedProxies in the merged X-Forwarded-For list — the IP added by the outermost of your trusted proxies, the only IP in the chain that none of your proxies have allowed an attacker to forge.",
+				Description: "Configuration for client IP resolution from X-Forwarded-For header given the exact number of trusted reverse proxies between this server and the public internet. It returns the IP at position len(xff) - numTrustedProxies in the merged X-Forwarded-For list — the IP added by the outermost of your trusted proxies, the only IP in the chain that none of your proxies have allowed an attacker to forge.",
 				Type:        "object",
 				Properties:  xffTrustedProxiesProps,
 				Required:    []string{keyType, keyNumTrustedProxies},
