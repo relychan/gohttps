@@ -1,3 +1,17 @@
+// Copyright 2026 RelyChan Pte. Ltd
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package middlewares
 
 import (
@@ -30,14 +44,15 @@ const (
 	// IPv4 clients on a dual-stack listener surface as ::ffff:a.b.c.d; they fold to plain v4 before storage so one logical client maps to one key.
 	// IPv6 zones are preserved (link-local connections may legitimately have one).
 	ClientIPFromRemoteAddr ClientIPResolutionType = "remote_addr"
-	// ClientIPFromHeader stores the client IP from a single-IP header set by your reverse proxy. Read it with GetClientIP.
-	// Only safe with headers your proxy unconditionally OVERWRITES on every request, e.g.:  X-Real-IP, X-Client-IP, CF-Connecting-IP — Cloudflare.
+	// ClientIPFromHeader stores the client IP from a single-IP header set by your reverse proxy.
+	// Only safe with headers your proxy unconditionally OVERWRITES on every request, e.g.:  X-Real-IP, X-Client-IP, CF-Connecting-IP.
 	// If the header reaches us with multiple values (misconfigured proxy that appends, or a downstream proxy not stripping a client-supplied value),
 	// the LAST value wins — that's the one set by the hop closest to us, and therefore the most trusted.
 	// Fail-closed if the last value doesn't parse: no client IP is set rather than falling back to earlier (less-trusted) values.
 	// v4-mapped IPv6 (::ffff:a.b.c.d) folds to plain v4 and IPv6 zones are stripped before storage.
 	ClientIPFromHeader ClientIPResolutionType = "header"
-	// ClientIPFromXForwardedFor stores the client IP read from the X-Forwarded-For header, walking the chain right-to-left and skipping any IP that falls within one of the given trusted CIDR prefixes.
+	// ClientIPFromXForwardedFor stores the client IP read from the X-Forwarded-For header,
+	// walking the chain right-to-left and skipping any IP that falls within one of the given trusted CIDR prefixes.
 	// The first IP that is not trusted is the client.
 	ClientIPFromXForwardedFor ClientIPResolutionType = "x_forward_for"
 	// ClientIPFromXForwardForTrustedProxies stores the client IP read from the X-Forwarded-For header, given the exact number of trusted reverse proxies between this server and the public internet.
@@ -50,7 +65,7 @@ const (
 type ClientIPConfig struct {
 	// Type of the strategy that the client IP should be parsed from.
 	Type ClientIPResolutionType `env:"SERVER_CLIENT_IP_RESOLUTION_TYPE" json:"type" yaml:"type"`
-	// List of headers to be looked up. Required if type=remote_addr.
+	// List of headers to be looked up. Required if type=header.
 	Headers []string `env:"SERVER_CLIENT_IP_HEADERS" json:"headers,omitempty" yaml:"headers,omitempty"`
 	// List of CIDR prefixes to be trusted when parsing the client IP from the X-Forwarded-For header. Required if type=x_forward_for.
 	TrustedIPPrefixes []string `env:"SERVER_TRUSTED_CLIENT_IP_PREFIXES" json:"trustedIpPrefixes,omitempty" yaml:"trustedIpPrefixes,omitempty"`
@@ -78,17 +93,17 @@ func (cic ClientIPConfig) Validate() error {
 			return errClientIPTrustedIPPrefixesRequired
 		}
 
-		return nil
-	case ClientIPFromXForwardForTrustedProxies:
-		if cic.NumTrustedProxies == 0 {
-			return errClientIPInvalidNumTrustedProxies
-		}
-
 		for _, p := range cic.TrustedIPPrefixes {
 			_, err := netip.ParsePrefix(p)
 			if err != nil {
 				return err
 			}
+		}
+
+		return nil
+	case ClientIPFromXForwardForTrustedProxies:
+		if cic.NumTrustedProxies <= 0 {
+			return errClientIPInvalidNumTrustedProxies
 		}
 
 		return nil

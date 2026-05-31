@@ -94,15 +94,6 @@ func TestClientIPConfig_Validate(t *testing.T) {
 			config:  ClientIPConfig{Type: ClientIPFromXForwardForTrustedProxies, NumTrustedProxies: 0},
 			wantErr: errClientIPInvalidNumTrustedProxies,
 		},
-		{
-			name: "x_forward_for_trusted_proxies invalid CIDR",
-			config: ClientIPConfig{
-				Type:              ClientIPFromXForwardForTrustedProxies,
-				NumTrustedProxies: 1,
-				TrustedIPPrefixes: []string{"not-a-cidr"},
-			},
-			wantErr: errClientIPInvalidNumTrustedProxies, // parse error, not the sentinel
-		},
 	}
 
 	for _, tc := range tests {
