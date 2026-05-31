@@ -37,11 +37,14 @@ import (
 func NewRouter(config *ServerConfig, logger *slog.Logger) *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Use(middleware.RealIP)
 	router.Use(middlewares.Decompress)
 
 	if config == nil {
 		return router
+	}
+
+	if config.ClientIP != nil {
+		router.Use(middlewares.ClientIP(config.ClientIP))
 	}
 
 	if config.RequestTimeout > 0 {
@@ -123,7 +126,7 @@ func ListenAndServe(ctx context.Context, router *chi.Mux, config *ServerConfig) 
 	}
 
 	server := http.Server{
-		Addr: fmt.Sprintf(":%d", config.GetPort()),
+		Addr: ":" + strconv.Itoa(config.GetPort()),
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
@@ -185,7 +188,7 @@ func CreatePrometheusServer(router *chi.Mux, currentPort int) (*http.Server, err
 		promServer := createPrometheusServerInternal(prometheusPort)
 
 		slog.Info(
-			fmt.Sprintf("Listening prometheus server on %d", prometheusPort),
+			"Listening prometheus server on " + strconv.Itoa(prometheusPort),
 		)
 
 		return promServer, nil
@@ -199,7 +202,7 @@ func createPrometheusServerInternal(port int) *http.Server {
 	mux.Handle(pathMetrics, promhttp.Handler())
 
 	return &http.Server{
-		Addr:              fmt.Sprintf(":%d", port),
+		Addr:              ":" + strconv.Itoa(port),
 		Handler:           mux,
 		ReadHeaderTimeout: 30 * time.Second,
 	}
