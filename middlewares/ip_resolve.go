@@ -132,9 +132,8 @@ func clientIPFromHeaders(headers []string) func(next http.Handler) http.Handler 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			for _, header := range headers {
-				_, ok := r.Header[header]
-				if ok {
-					middleware.ClientIPFromHeader(header)
+				if _, ok := r.Header[header]; ok {
+					middleware.ClientIPFromHeader(header)(next).ServeHTTP(w, r)
 
 					return
 				}
