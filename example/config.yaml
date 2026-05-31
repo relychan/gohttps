@@ -16,3 +16,5 @@ cors:
   optionsPassthrough: true
   allowedHeaders: []
   maxAge: 3600
+clientIp:
+  type: remote_addr

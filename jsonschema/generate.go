@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 
@@ -45,7 +46,9 @@ func jsonSchemaConfiguration() error {
 	}
 
 	reflectSchema := r.Reflect(gohttps.ServerConfig{})
+	clientIPConfigSchema := r.Reflect(ClientIPConfig{})
 
+	maps.Copy(reflectSchema.Definitions, clientIPConfigSchema.Definitions)
 	// custom schema types
 	reflectSchema.Definitions["Duration"] = &jsonschema.Schema{
 		Type:        "string",
