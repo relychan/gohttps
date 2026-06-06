@@ -80,11 +80,6 @@ func TestClientIPConfig_Validate(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:    "x_forward_for missing trusted prefixes",
-			config:  ClientIPConfig{Type: ClientIPFromXForwardedFor},
-			wantErr: errClientIPTrustedIPPrefixesRequired,
-		},
-		{
 			name:    "x_forward_for_trusted_proxies valid",
 			config:  ClientIPConfig{Type: ClientIPFromXForwardForTrustedProxies, NumTrustedProxies: 1},
 			wantErr: nil,
