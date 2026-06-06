@@ -27,9 +27,8 @@ var (
 	errClientIPHeaderRequired = errors.New(
 		"headers are required for the header client ip resolution type",
 	)
-	errClientIPHeaderEmpty               = errors.New("header must be a non-empty string")
-	errClientIPTrustedIPPrefixesRequired = errors.New("trusted IP prefixes must not be empty")
-	errClientIPInvalidNumTrustedProxies  = errors.New(
+	errClientIPHeaderEmpty              = errors.New("header must be a non-empty string")
+	errClientIPInvalidNumTrustedProxies = errors.New(
 		"the number of trusted proxies must be larger than 0",
 	)
 )
@@ -89,10 +88,6 @@ func (cic ClientIPConfig) Validate() error {
 
 		return nil
 	case ClientIPFromXForwardedFor:
-		if len(cic.TrustedIPPrefixes) == 0 {
-			return errClientIPTrustedIPPrefixesRequired
-		}
-
 		for _, p := range cic.TrustedIPPrefixes {
 			_, err := netip.ParsePrefix(p)
 			if err != nil {

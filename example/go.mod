@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.3.0
 	github.com/hasura/gotel v0.8.1
 	github.com/relychan/gohttps v0.0.1
-	github.com/relychan/goutils v0.0.0-20260529174539-fae163d678da
+	github.com/relychan/goutils v0.0.0-20260606074624-e7ca20d73713
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.68.0 // indirect
+	github.com/prometheus/common v0.68.1 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/relychan/gocompress v0.2.1 // indirect
