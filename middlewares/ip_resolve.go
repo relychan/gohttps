@@ -53,11 +53,11 @@ const (
 	// ClientIPFromXForwardedFor stores the client IP read from the X-Forwarded-For header,
 	// walking the chain right-to-left and skipping any IP that falls within one of the given trusted CIDR prefixes.
 	// The first IP that is not trusted is the client.
-	ClientIPFromXForwardedFor ClientIPResolutionType = "x_forward_for"
+	ClientIPFromXForwardedFor ClientIPResolutionType = "x_forwarded_for"
 	// ClientIPFromXForwardForTrustedProxies stores the client IP read from the X-Forwarded-For header, given the exact number of trusted reverse proxies between this server and the public internet.
 	// It returns the IP at position len(xff) - numTrustedProxies in the merged X-Forwarded-For list — the IP added by the outermost of your trusted proxies,
 	// the only IP in the chain that none of your proxies have allowed an attacker to forge.
-	ClientIPFromXForwardForTrustedProxies ClientIPResolutionType = "x_forward_for_trusted_proxies"
+	ClientIPFromXForwardForTrustedProxies ClientIPResolutionType = "x_forwarded_for_trusted_proxies"
 )
 
 // ClientIPConfig represents the configuration for IP resolution from HTTP requests.
@@ -66,9 +66,9 @@ type ClientIPConfig struct {
 	Type ClientIPResolutionType `env:"SERVER_CLIENT_IP_RESOLUTION_TYPE" json:"type" yaml:"type"`
 	// List of headers to be looked up. Required if type=header.
 	Headers []string `env:"SERVER_CLIENT_IP_HEADERS" json:"headers,omitempty" yaml:"headers,omitempty"`
-	// List of CIDR prefixes to be trusted when parsing the client IP from the X-Forwarded-For header. Required if type=x_forward_for.
+	// List of CIDR prefixes to be trusted when parsing the client IP from the X-Forwarded-For header. Required if type=x_forwarded_for.
 	TrustedIPPrefixes []string `env:"SERVER_TRUSTED_CLIENT_IP_PREFIXES" json:"trustedIpPrefixes,omitempty" yaml:"trustedIpPrefixes,omitempty"`
-	// The exact number of trusted reverse proxies between this server and the public internet. Required if type=x_forward_for_trusted_proxies.
+	// The exact number of trusted reverse proxies between this server and the public internet. Required if type=x_forwarded_for_trusted_proxies.
 	NumTrustedProxies int `env:"SERVER_CLIENT_IP_NUM_TRUSTED_PROXIES" json:"numTrustedProxies,omitempty" yaml:"numTrustedProxies,omitempty"`
 }
 

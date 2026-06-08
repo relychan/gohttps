@@ -75,17 +75,17 @@ func TestClientIPConfig_Validate(t *testing.T) {
 			wantErr: errClientIPHeaderEmpty,
 		},
 		{
-			name:    "x_forward_for valid",
+			name:    "x_forward_edfor valid",
 			config:  ClientIPConfig{Type: ClientIPFromXForwardedFor, TrustedIPPrefixes: []string{"10.0.0.0/8"}},
 			wantErr: nil,
 		},
 		{
-			name:    "x_forward_for_trusted_proxies valid",
+			name:    "x_forwarded_for_trusted_proxies valid",
 			config:  ClientIPConfig{Type: ClientIPFromXForwardForTrustedProxies, NumTrustedProxies: 1},
 			wantErr: nil,
 		},
 		{
-			name:    "x_forward_for_trusted_proxies zero proxies",
+			name:    "x_forwarded_for_trusted_proxies zero proxies",
 			config:  ClientIPConfig{Type: ClientIPFromXForwardForTrustedProxies, NumTrustedProxies: 0},
 			wantErr: errClientIPInvalidNumTrustedProxies,
 		},
@@ -96,7 +96,7 @@ func TestClientIPConfig_Validate(t *testing.T) {
 			err := tc.config.Validate()
 
 			// For the invalid-CIDR case we only check that an error is returned.
-			if tc.name == "x_forward_for_trusted_proxies invalid CIDR" {
+			if tc.name == "x_forwarded_for_trusted_proxies invalid CIDR" {
 				if err == nil {
 					t.Fatal("expected error for invalid CIDR prefix, got nil")
 				}
