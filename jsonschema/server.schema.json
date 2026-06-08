@@ -102,7 +102,7 @@
       "type": {
        "type": "string",
        "enum": [
-        "x_forward_for"
+        "x_forwarded_for"
        ],
        "description": "Type of the strategy that the client IP should be parsed from."
       },
@@ -129,7 +129,7 @@
       "type": {
        "type": "string",
        "enum": [
-        "x_forward_for_trusted_proxies"
+        "x_forwarded_for_trusted_proxies"
        ],
        "description": "Type of the strategy that the client IP should be parsed from."
       },
