@@ -75,7 +75,7 @@ func TestClientIPConfig_Validate(t *testing.T) {
 			wantErr: errClientIPHeaderEmpty,
 		},
 		{
-			name:    "x_forward_edfor valid",
+			name:    "x_forwarded_for valid",
 			config:  ClientIPConfig{Type: ClientIPFromXForwardedFor, TrustedIPPrefixes: []string{"10.0.0.0/8"}},
 			wantErr: nil,
 		},
