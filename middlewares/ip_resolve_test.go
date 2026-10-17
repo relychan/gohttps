@@ -258,9 +258,13 @@ func TestClientIP_XForwardedFor(t *testing.T) {
 		TrustedIPPrefixes: []string{"10.0.0.0/8"},
 	})
 
+	// The TCP peer must be trusted for X-Forwarded-For to be read.
+	const trustedPeer = "10.0.0.9:1234"
+
 	t.Run("client before trusted proxy", func(t *testing.T) {
 		got = ""
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.RemoteAddr = trustedPeer
 		// Chain: client → trusted proxy; rightmost trusted is skipped.
 		req.Header.Set("X-Forwarded-For", "203.0.113.5, 10.0.0.1")
 		w := httptest.NewRecorder()
@@ -273,6 +277,7 @@ func TestClientIP_XForwardedFor(t *testing.T) {
 	t.Run("untrusted IP is client directly", func(t *testing.T) {
 		got = ""
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.RemoteAddr = trustedPeer
 		req.Header.Set("X-Forwarded-For", "198.51.100.7")
 		w := httptest.NewRecorder()
 		mw(captureClientIP(t, &got)).ServeHTTP(w, req)
@@ -284,6 +289,7 @@ func TestClientIP_XForwardedFor(t *testing.T) {
 	t.Run("all trusted leaves no client IP", func(t *testing.T) {
 		got = ""
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.RemoteAddr = trustedPeer
 		req.Header.Set("X-Forwarded-For", "10.0.0.2, 10.0.0.1")
 		w := httptest.NewRecorder()
 		mw(captureClientIP(t, &got)).ServeHTTP(w, req)
@@ -291,6 +297,33 @@ func TestClientIP_XForwardedFor(t *testing.T) {
 			t.Errorf("expected empty client IP when all hops are trusted, got %q", got)
 		}
 	})
+
+	t.Run("untrusted peer ignores spoofed header", func(t *testing.T) {
+		got = ""
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.RemoteAddr = "198.51.100.7:1234"
+		req.Header.Set("X-Forwarded-For", "203.0.113.5")
+		w := httptest.NewRecorder()
+		mw(captureClientIP(t, &got)).ServeHTTP(w, req)
+		if got != "198.51.100.7" {
+			t.Errorf("expected 198.51.100.7, got %q", got)
+		}
+	})
+}
+
+func TestClientIP_XForwardedForNoPrefixes(t *testing.T) {
+	var got string
+	mw := ClientIP(&ClientIPConfig{Type: ClientIPFromXForwardedFor})
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("X-Forwarded-For", "203.0.113.5, 10.0.0.1")
+	w := httptest.NewRecorder()
+	mw(captureClientIP(t, &got)).ServeHTTP(w, req)
+
+	// Without trusted prefixes, the rightmost entry is the client IP.
+	if got != "10.0.0.1" {
+		t.Errorf("expected 10.0.0.1, got %q", got)
+	}
 }
 
 func TestClientIP_XForwardedForTrustedProxies(t *testing.T) {
