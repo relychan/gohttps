@@ -10,6 +10,7 @@ linters:
     - mnd
     - nilnil
     - gomodguard
+    - exhaustruct_v5
   settings:
     depguard:
       rules:
