@@ -22,9 +22,9 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"uuid"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 	"github.com/relychan/goutils/httperror"
 	"github.com/relychan/goutils/httpheader"
 	"go.opentelemetry.io/otel/attribute"
@@ -204,7 +204,7 @@ func GetRequestLogger(r *http.Request) *slog.Logger {
 }
 
 func getRequestID(r *http.Request) string {
-	requestID := r.Header.Get("x-request-id")
+	requestID := r.Header.Get("X-Request-ID")
 	if requestID != "" {
 		return requestID
 	}
@@ -214,5 +214,5 @@ func getRequestID(r *http.Request) string {
 		return spanContext.TraceID().String()
 	}
 
-	return uuid.NewString()
+	return uuid.New().String()
 }

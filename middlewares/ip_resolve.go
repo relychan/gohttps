@@ -53,6 +53,8 @@ const (
 	// ClientIPFromXForwardedFor stores the client IP read from the X-Forwarded-For header,
 	// walking the chain right-to-left and skipping any IP that falls within one of the given trusted CIDR prefixes.
 	// The first IP that is not trusted is the client.
+	// The TCP peer in RemoteAddr is treated as the rightmost hop: if it is not within a trusted prefix, it is the client IP and X-Forwarded-For is ignored.
+	// If no prefix is given, the rightmost X-Forwarded-For entry is the client IP — safe only with exactly one trusted hop directly in front of this server.
 	ClientIPFromXForwardedFor ClientIPResolutionType = "x_forwarded_for"
 	// ClientIPFromXForwardForTrustedProxies stores the client IP read from the X-Forwarded-For header, given the exact number of trusted reverse proxies between this server and the public internet.
 	// It returns the IP at position len(xff) - numTrustedProxies in the merged X-Forwarded-For list — the IP added by the outermost of your trusted proxies,
@@ -124,6 +126,11 @@ func ClientIP(config *ClientIPConfig) func(next http.Handler) http.Handler {
 
 		return clientIPFromHeaders(config.Headers)
 	case ClientIPFromXForwardedFor:
+		// chi panics without prefixes. Trusting the rightmost XFF entry keeps the old no-prefix behavior.
+		if len(config.TrustedIPPrefixes) == 0 {
+			return middleware.ClientIPFromXFFTrustedProxies(1)
+		}
+
 		return middleware.ClientIPFromXFF(config.TrustedIPPrefixes...)
 	case ClientIPFromXForwardForTrustedProxies:
 		return middleware.ClientIPFromXFFTrustedProxies(config.NumTrustedProxies)
